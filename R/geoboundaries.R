@@ -7,10 +7,10 @@
 #' @export
 geoboundaries <- function(country_iso3, adm_level, quiet_download = FALSE) {
   if (length(country_iso3) >= 2) {
-    l <- lapply(country_iso3, function(x) .get_geoboundaries(x, adm_level, quiet_download = quiet_download))
+    l <- lapply(country_iso3, function(x) get_geoboundaries(x, adm_level, quiet_download = quiet_download))
     res <- do.call(rbind, l)
   } else {
-    res <- .get_geoboundaries(country_iso3[1], adm_level, quiet_download = quiet_download)
+    res <- get_geoboundaries(country_iso3, adm_level, quiet_download = quiet_download)
   }
   res
 }

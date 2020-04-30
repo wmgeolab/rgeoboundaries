@@ -47,3 +47,6 @@ download_geoboundaries <- function(dir = NULL, country_iso3, adm_level, quiet = 
   file <- file.path(zipfile, file)
   sf::read_sf(file.path("/vsizip/", file))
 }
+
+#' @noRd
+get_geoboundaries <- memoise::memoize(.get_geoboundaries)
