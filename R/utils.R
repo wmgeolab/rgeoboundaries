@@ -45,5 +45,5 @@ download_geoboundaries <- function(dir = NULL, country_iso3, adm_level, quiet = 
   zipfile <- download_geoboundaries(country_iso3 = country_iso3, adm_level = adm_level, quiet = quiet_download)
   file <- grep("\\.geojson$", unzip(zipfile, list = TRUE)$Name, value = TRUE)
   file <- file.path(zipfile, file)
-  read_sf(file.path("/vsizip/", file))
+  sf::read_sf(file.path("/vsizip/", file))
 }

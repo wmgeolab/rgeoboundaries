@@ -1,15 +1,33 @@
 Package: rgeoboundaries
-Title: What the Package Does (One Line, Title Case)
+Title: A R client to geoBoundaries : A Political Administrative Boundaries Dataset
 Version: 0.0.0.9000
-Authors@R: 
-    person(given = "First",
-           family = "Last",
+Authors@R:
+    person(given = "Ahmadou",
+           family = "Dicko",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+           email = "mail@ahmadoudicko.com")
+Description: Client the access data geoBoundaries : A Political Administrative Boundaries Dataset
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+URL: https://gitlab.com/dickoa/rgeoboundaries
+BugReports: https://gitlab.com/dickoa/rgeoboundaries/issues
+Depends:
+    R (>= 3.5)
+Imports:
+    crul (>= 0.8),
+    jsonlite,
+    sf,
+    memoise,
+    hoardr,
+    countrycode
+Suggests:
+    roxygen2,
+    knitr,
+    rmarkdown,
+    testthat,
+    covr,
+    webmockr,
+    vcr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0
