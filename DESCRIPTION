@@ -1,12 +1,12 @@
 Package: rgeoboundaries
-Title: A R client to geoBoundaries : A Political Administrative Boundaries Dataset
+Title: A Client to geoBoundaries, A Political Administrative Boundaries Dataset
 Version: 0.0.0.9000
 Authors@R:
     person(given = "Ahmadou",
            family = "Dicko",
            role = c("aut", "cre"),
            email = "mail@ahmadoudicko.com")
-Description: Client the access data geoBoundaries : A Political Administrative Boundaries Dataset
+Description: Client the access data geoBoundaries administrative boundaries dataset.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -17,10 +17,10 @@ Depends:
 Imports:
     crul (>= 0.8),
     jsonlite,
-    sf,
+    sf (>= 0.9.3),
+    glue,
     memoise,
-    hoardr,
-    countrycode
+    countrycode (>= 1.2.0)
 Suggests:
     roxygen2,
     knitr,

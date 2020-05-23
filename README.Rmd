@@ -9,7 +9,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "100%",
+  dev = "svg"
 )
 ```
 
@@ -39,9 +40,19 @@ remotes::install_gitlab("dickoa/rgeoboundaries")
 
 This is a basic example which shows you how get Senegal administrative level 3 boundaries and plot it
 
-```{r example}
+```{r plot}
 library(rgeoboundaries)
 library(sf)
-sen_adm3 <- geoboundaries("sen", "adm3")
-plot(st_geometry(sen_adm3))
+mli_sen <- gb_adm1(c("mali", "senegal"))
+plot(st_geometry(mli_sen))
 ```
+
+```{r, metadata}
+knitr::kable(gb_metadata(c("mali", "senegal"), "adm1"))
+```
+
+## How to to cite
+
+If you are using this package in your analysis, please cite the original `geoBoundaries` work:
+
+> Runfola, D., Seitz, L., Hobbs, L., Panginaban, J., Oberman, R. et al. geoBoundaries Global Administrative Database. http://www.geoboundaries.org.

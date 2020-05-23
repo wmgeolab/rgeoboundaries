@@ -2,20 +2,48 @@
 % Please edit documentation in R/geoboundaries.R
 \name{geoboundaries}
 \alias{geoboundaries}
+\alias{gb_adm0}
+\alias{gb_adm1}
+\alias{gb_adm2}
+\alias{gb_adm3}
+\alias{gb_adm4}
+\alias{gb_adm5}
 \title{Get the administrative boundaries of selected countries}
 \usage{
-geoboundaries(country_iso3, adm_level, quiet_download = FALSE)
+geoboundaries(country, adm_lvl = "adm0", quiet = TRUE)
+
+gb_adm0(country, quiet = TRUE)
+
+gb_adm1(country, quiet = TRUE)
+
+gb_adm2(country, quiet = TRUE)
+
+gb_adm3(country, quiet = TRUE)
+
+gb_adm4(country, quiet = TRUE)
+
+gb_adm5(country, quiet = TRUE)
 }
 \arguments{
-\item{country_iso3}{vector of country iso3}
+\item{country}{characher; a vector of country names}
 
-\item{adm_level}{a character with desired adminadm0, adm1, adm2 or adm3}
+\item{adm_lvl}{characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. admO being the country.}
 
-\item{quiet_download}{a logical value, if TRUE download are quiet. Default to FALSE}
+\item{quiet}{logical; if TRUE download are quiet. Default to FALSE}
 }
 \value{
-a sf object
+a \code{sf} object
 }
 \description{
-Get the administrative boundaries of selected countries
+Access country boundaries at a specified administrative level
+}
+\details{
+\itemize{
+\item \code{gb_adm0} returns the country boundaries
+\item \code{gb_adm1} if available, returns the country first administrative level boundaries
+\item \code{gb_adm2} if available, returns the country second administrative level boundaries
+\item \code{gb_adm3} if available, returns the country third administrative level boundaries
+\item \code{gb_adm4} if available, returns the country fourth administrative level boundaries
+\item \code{gb_adm5} if available, returns the country first administrative level boundaries
+}
 }

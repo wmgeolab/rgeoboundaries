@@ -1,18 +1,24 @@
-image: rocker/r-base:latest
+image: rocker/tidyverse:latest
+
+variables:
+  CODECOV_TOKEN: $CODECOV_TOKEN
 
 pages:
   stage: deploy
 
   before_script:
-    - apt-get update -qq
-    - apt-get install -t unstable software-properties-common --yes
-    - apt-get install -t unstable --yes libssl-dev libssh2-1-dev libxml2-dev libcurl4-gnutls-dev libgit2-dev libmagick++-dev pandoc pandoc-citeproc libudunits2-dev libgdal-dev
+    - apt update -qq
+    - apt install --yes libssl-dev libssh2-1-dev libxml2-dev libcurl4-gnutls-dev libgit2-dev libmagick++-dev pandoc pandoc-citeproc libudunits2-dev libgdal-dev libgmp-dev libmpfr-dev
 
   script:
-    - Rscript -e 'install.packages(c("devtools", "tidyverse", "remotes", "pkgdown", "testthat"))'
+    - Rscript -e 'install.packages("pkgdown")'
     - Rscript -e 'devtools::install_deps(dependencies = TRUE)'
     - Rscript -e 'remotes::install_gitlab("dickoa/rgeoboundaries")'
     - Rscript -e 'pkgdown::build_site(override = list(destination = "public"))'
+
+  after_script:
+    - Rscript -e 'covr::package_coverage()'
+    - Rscript -e 'covr::codecov()'
 
   artifacts:
     paths:
