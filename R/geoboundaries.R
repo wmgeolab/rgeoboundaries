@@ -22,13 +22,15 @@
 #' @export
 geoboundaries <- function(country, adm_lvl = "adm0", quiet = TRUE) {
   links <- get_download_link(country, adm_lvl)
+  links <- as.character(links)
   shps <- get_shp_from_link(links)
+  path <- file.path("/vsizip/vsizip/vsicurl", links, shps)
   if (length(country) >= 2) {
     l <- lapply(seq_along(links), function(i)
-      sf::st_read(file.path("/vsizip/vsizip/vsicurl", links[i], shps[i]), quiet = quiet))
+      sf::st_read(path[i], quiet = quiet))
     res <- do.call(rbind, l)
   } else {
-    res <- sf::st_read(file.path("/vsizip/vsizip/vsicurl", links, shps), quiet = quiet)
+    res <- sf::st_read(path, quiet = quiet)
   }
   res
 }

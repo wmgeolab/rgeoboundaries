@@ -31,19 +31,16 @@ build_urls <- function(iso3, adm_level) {
   glue::glue(template_url, iso3 = toupper(iso3), adm_level = toupper(adm_level))
 }
 
+#' @rdname gb_metadata
+#' @importFrom crul Async HttpClient
 #' @noRd
-#' @importFrom crul HttpClient
-cli <- crul::HttpClient$new(baseurl())
-
-#' @noRd
-#' @importFrom crul Async
 .gb_metadata <- function(country, adm_level) {
   iso3 <- country_to_iso3(country)
   assert_admin_level(adm_level)
   if (length(iso3) >= 2) {
     urls <- build_urls(iso3, adm_level)
-    cli <- crul::Async$new(url = urls)
-    l <- cli$get()
+    async_cli <- crul::Async$new(url = urls)
+    l <- async_cli$get()
     l <- lapply(seq_along(l), function(i) {
       r <- l[[i]]
       r <- r$parse(encoding = "UTF-8")
@@ -54,6 +51,7 @@ cli <- crul::HttpClient$new(baseurl())
     })
     do.call(rbind, l)
   } else {
+    cli <- crul::HttpClient$new(baseurl())
     res <-  cli$get(query = list(ISO = toupper(iso3),
                                  ADM = toupper(adm_level)))
     res <- res$parse(encoding = "UTF-8")
@@ -64,8 +62,15 @@ cli <- crul::HttpClient$new(baseurl())
   }
 }
 
-#' @noRd
+#' Get metadata for a country and an administrative level
+#'
+#' Get metadata for a country and an administrative level
+#'
+#' @param country characher; a vector of country names
+#' @param adm_level characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. admO being the country.
+#' @rdname gb_metadata
 #' @importFrom memoise memoise
+#' @export
 gb_metadata <- memoise::memoise(.gb_metadata)
 
 #' @noRd

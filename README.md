@@ -5,18 +5,18 @@
 
 <!-- badges: start -->
 
-[![Project Status: Active - Initial development is in progress, but
-there has not yet been a stable, usable release suitable for the
-public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip)
 [![GitLab CI Build
 Status](https://gitlab.com/dickoa/rgeoboundaries/badges/master/pipeline.svg)](https://gitlab.com/dickoa/rgeoboundaries/pipelines)
+[![Codecov Code
+Coverage](https://codecov.io/gl/dickoa/rgeoboundaries/branch/master/graph/badge.svg)](https://codecov.io/gl/dickoa/rgeoboundaries)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/rgeoboundaries)](https://cran.r-project.org/package=rgeoboundaries)
 [![License:
 MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-`rgeoboundaries` is an R client for the [GeoBoundaries
-API](https://www.geoboundaries.org/)
+`rgeoboundaries` is an R client for the [geoBoundaries
+API](https://www.geoboundaries.org/), providing country political
+administrative boundaries.
 
 <!-- badges: end -->
 
@@ -32,8 +32,8 @@ remotes::install_gitlab("dickoa/rgeoboundaries")
 
 ## Access administrative boundaries using rgeoboundaries
 
-This is a basic example which shows you how get Senegal administrative
-level 3 boundaries and plot it
+This is a basic example which shows you how get Mali and Senegal
+administrative level 1 boundaries and plot it
 
 ``` r
 library(rgeoboundaries)
