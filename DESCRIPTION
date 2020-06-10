@@ -16,6 +16,7 @@ Imports:
     crul (>= 0.8),
     jsonlite,
     sf (>= 0.9.3),
+    hoardr,
     glue,
     memoise,
     countrycode (>= 1.2.0),
