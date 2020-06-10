@@ -43,7 +43,7 @@ This is a basic example which shows you how get Mali and Senegal administrative 
 ```{r plot}
 library(rgeoboundaries)
 library(sf)
-mli_sen <- gb_adm1(c("mali", "senegal"))
+mli_sen <- gb_adm1(c("mali", "senegal"), type = "sscgs")
 plot(st_geometry(mli_sen))
 ```
 

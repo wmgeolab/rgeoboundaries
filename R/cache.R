@@ -8,7 +8,6 @@
 #' `~/.cache/R/gb_cache`, but you can set
 #' your own path using `gb_set_cache(path)`
 #'
-#'
 #' @importFrom hoardr hoard
 #'
 #' @examples \dontrun{
@@ -44,6 +43,20 @@ gb_set_cache <- function(path) {
   rhdx_cache$cache_path_set(path)
 }
 
+#' Displays the full path to the cache directory
+#'
+#' @rdname gb_cache
+#'
+#' @param create logical; if TRUE create missing cache
+#'
+#' @export
+gb_get_cache <- function(create = FALSE) {
+  dir <- gb_cache$cache_path_get()
+  if (create & !dir.exists(dir))
+    gb_cache$mkdir()
+  dir
+}
+
 #' Clear all cached files
 #'
 #' @rdname gb_cache
@@ -54,15 +67,6 @@ gb_set_cache <- function(path) {
 gb_clear_cache <- function(force = FALSE) {
   files <- list.files(gb_cache$cache_path_get(), full.names = TRUE)
   unlink(files, recursive = TRUE, force = force)
-}
-
-#' Displays the full path to the cache directory
-#'
-#' @rdname gb_cache
-#'
-#' @export
-gb_get_cache <- function() {
-  gb_cache$cache_path_get()
 }
 
 #' List of files available in the cache directory

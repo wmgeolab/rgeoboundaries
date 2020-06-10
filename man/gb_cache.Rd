@@ -3,17 +3,17 @@
 \name{gb_cache}
 \alias{gb_cache}
 \alias{gb_set_cache}
-\alias{gb_clear_cache}
 \alias{gb_get_cache}
+\alias{gb_clear_cache}
 \alias{gb_list_cache}
 \alias{gb_delete_from_cache}
 \title{Caching geoBoundaries downloaded files}
 \usage{
 gb_set_cache(path)
 
-gb_clear_cache(force = FALSE)
+gb_get_cache(create = FALSE)
 
-gb_get_cache()
+gb_clear_cache(force = FALSE)
 
 gb_list_cache(full_path = FALSE)
 
@@ -21,6 +21,8 @@ gb_delete_from_cache(file)
 }
 \arguments{
 \item{path}{character; path of the directory to set}
+
+\item{create}{logical; if TRUE create missing cache}
 
 \item{force}{logical; force delete. default: \code{FALSE}}
 

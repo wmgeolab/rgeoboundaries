@@ -2,14 +2,19 @@
 % Please edit documentation in R/utils.R
 \name{gb_metadata}
 \alias{gb_metadata}
-\title{Get metadata for a country and an administrative level}
+\title{Get metadata for a country, administrative level, type of data and version}
 \usage{
-gb_metadata(country, adm_level)
+gb_metadata(country, adm_level, type = NULL, version = NULL)
 }
 \arguments{
 \item{country}{characher; a vector of country names}
 
 \item{adm_level}{characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. admO being the country.}
+
+\item{type}{character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, or SSCU. Determines the type of boundary link you receive. More on details}
+
+\item{version}{character; defaults to the most recent version of geoBoundaries available. The geoboundaries version requested, with underscores.
+For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.}
 }
 \description{
 Get metadata for a country and an administrative level

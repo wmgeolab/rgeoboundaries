@@ -18,7 +18,7 @@ Imports:
     sf (>= 0.9.3),
     glue,
     memoise,
-    countrycode (>= 1.2.0)
+    countrycode (>= 1.2.0),
 Suggests:
     roxygen2,
     knitr,

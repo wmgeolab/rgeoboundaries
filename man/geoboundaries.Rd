@@ -10,24 +10,32 @@
 \alias{gb_adm5}
 \title{Get the administrative boundaries of selected countries}
 \usage{
-geoboundaries(country, adm_lvl = "adm0", quiet = TRUE)
+geoboundaries(
+  country,
+  adm_lvl = "adm0",
+  type = NULL,
+  version = NULL,
+  quiet = TRUE
+)
 
-gb_adm0(country, quiet = TRUE)
+gb_adm0(country, type = NULL, version = NULL, quiet = TRUE)
 
-gb_adm1(country, quiet = TRUE)
+gb_adm1(country, type = NULL, version = NULL, quiet = TRUE)
 
-gb_adm2(country, quiet = TRUE)
+gb_adm2(country, type = NULL, version = NULL, quiet = TRUE)
 
-gb_adm3(country, quiet = TRUE)
+gb_adm3(country, type = NULL, version = NULL, quiet = TRUE)
 
-gb_adm4(country, quiet = TRUE)
+gb_adm4(country, type = NULL, version = NULL, quiet = TRUE)
 
-gb_adm5(country, quiet = TRUE)
+gb_adm5(country, type = NULL, version = NULL, quiet = TRUE)
 }
 \arguments{
 \item{country}{characher; a vector of country names}
 
 \item{adm_lvl}{characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. admO being the country.}
+
+\item{type}{character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, or SSCU. Determines the type of boundary link you receive. More on details}
 
 \item{quiet}{logical; if TRUE download are quiet. Default to FALSE}
 }
@@ -38,6 +46,26 @@ a \code{sf} object
 Access country boundaries at a specified administrative level
 }
 \details{
+Different types to of boundaries available:
+\itemize{
+\item HPSCU - High Precision Single Country Unstadardized. The premier geoBoundaries release,
+representing the highest precision files available for every country in the world.
+No standardization is performed on these files, so (for example) two countries may overlap in the case of contested boundaries.
+\item HPSCGS - High Precision Single Country Globally Standardized. A version of geoBoundaries
+high precision data that has been clipped to the U.S. Department of State boundary file,
+ensuring no contested boundaries or overlap in the dataset. This globally standardized
+product may have gaps between countries. If you need a product with no gaps,
+we recommend our simplified global product.
+\item SSCU - Simplified Single Country Unstandardized. A simplified version of every file
+available for every country in the world. No standardization is performed on these files,
+so (for example) two countries may overlap in the case of contested boundaries.
+\item SSCGS - Simplified Single Country Globally Standardized. A version of geoBoundaries
+simplified data that has been clipped to the U.S. Department of State boundary file,
+ensuring no contested boundaries or overlap in the dataset.
+This globally standardized product may have gaps between countries.
+}
+
+The following wrappers are available:
 \itemize{
 \item \code{gb_adm0} returns the country boundaries
 \item \code{gb_adm1} if available, returns the country first administrative level boundaries

@@ -8,7 +8,7 @@ pages:
 
   before_script:
     - apt update -qq
-    - apt install --yes libssl-dev libssh2-1-dev libxml2-dev libcurl4-gnutls-dev libgit2-dev libmagick++-dev pandoc pandoc-citeproc libudunits2-dev libgdal-dev libgmp-dev libmpfr-dev
+    - apt install --yes libssl-dev libssh2-1-dev libxml2-dev libcurl4-gnutls-dev libgit2-dev libmagick++-dev pandoc pandoc-citeproc libudunits2-dev libgdal-dev
 
   script:
     - Rscript -e 'install.packages("pkgdown")'
