@@ -41,7 +41,7 @@ remotes::install_gitlab("dickoa/rgeoboundaries")
 
 This is a basic example which shows you how get Mali and Senegal administrative level 1 boundaries and plot it
 
-```{r plot}
+```{r plot, cache = TRUE}
 library(rgeoboundaries)
 library(sf)
 mli_sen <- gb_adm1(c("mali", "senegal"), type = "sscgs")

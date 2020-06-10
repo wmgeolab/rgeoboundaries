@@ -18,11 +18,11 @@ country_to_iso3 <- function(country) {
 }
 
 #' @noRd
-assert_adm_level <- function(adm_level) {
-  if (length(adm_level) >= 2)
+assert_adm_lvl <- function(adm_lvl) {
+  if (length(adm_lvl) >= 2)
     stop("You can't mix differents administrative level!")
   dict <- paste0("adm", 0:5)
-  cond <- tolower(adm_level) %in% dict
+  cond <- tolower(adm_lvl) %in% dict
   if (!cond)
     stop("Not a valid ADMIN level code! Use 'ADM0', ADM1', 'ADM2', 'ADM3' 'ADM4' or 'ADM5'",
          call. = FALSE)
@@ -64,10 +64,10 @@ create_query <- function(x) {
 
 #' @noRd
 #' @importFrom glue glue_data
-build_urls <- function(iso3, adm_level,
+build_urls <- function(iso3, adm_lvl,
                        type = NULL, version = NULL) {
   l <- list(ISO = iso3,
-            ADM = adm_level,
+            ADM = adm_lvl,
             TYP = type,
             VER = version)
   l <- lapply(drop_nulls(l), toupper)
@@ -79,13 +79,13 @@ build_urls <- function(iso3, adm_level,
 #' @rdname gb_metadata
 #' @importFrom crul Async HttpClient
 #' @noRd
-.gb_metadata <- function(country, adm_level, type = NULL, version = NULL) {
+.gb_metadata <- function(country, adm_lvl, type = NULL, version = NULL) {
   iso3 <- country_to_iso3(country)
-  assert_adm_level(adm_level)
+  assert_adm_lvl(adm_lvl)
   assert_type(type)
   assert_version(version)
   if (length(iso3) >= 2) {
-    urls <- build_urls(iso3, adm_level, type, version)
+    urls <- build_urls(iso3, adm_lvl, type, version)
     async_cli <- crul::Async$new(url = urls)
     l <- async_cli$get()
     l <- lapply(seq_along(l), function(i) {
@@ -93,7 +93,7 @@ build_urls <- function(iso3, adm_level,
       r <- r$parse(encoding = "UTF-8")
       r <- jsonlite::fromJSON(r, simplifyVector = FALSE)
       if (length(r) == 0)
-        warning(paste(toupper(adm_level),
+        warning(paste(toupper(adm_lvl),
                       "not available for", country[i]), call. = TRUE)
       as.data.frame(r)
     })
@@ -101,13 +101,13 @@ build_urls <- function(iso3, adm_level,
   } else {
     cli <- crul::HttpClient$new(baseurl())
     res <-  cli$get(query = list(ISO = toupper(iso3),
-                                 ADM = toupper(adm_level),
+                                 ADM = toupper(adm_lvl),
                                  TYP = toupper(type),
                                  VER = toupper(version)))
     res <- res$parse(encoding = "UTF-8")
     res <- jsonlite::fromJSON(res, simplifyVector = FALSE)
     if (length(res) == 0)
-      stop(paste(toupper(adm_level), "not available for", country))
+      stop(paste(toupper(adm_lvl), "not available for", country))
     as.data.frame(res)
   }
 }
@@ -117,7 +117,7 @@ build_urls <- function(iso3, adm_level,
 #' Get metadata for a country and an administrative level
 #'
 #' @param country characher; a vector of country names
-#' @param adm_level characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. admO being the country.
+#' @param adm_lvl characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. admO being the country.
 #' @param type character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, or SSCU. Determines the type of boundary link you receive. More on details
 #' @param version character; defaults to the most recent version of geoBoundaries available. The geoboundaries version requested, with underscores.
 #' For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.
@@ -132,14 +132,14 @@ gb_metadata <- memoise::memoise(.gb_metadata)
 #' Get download link for a country, administrative level, type of data and version
 #'
 #' @param country characher; a vector of country names
-#' @param adm_level characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. admO being the country.
+#' @param adm_lvl characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. admO being the country.
 #' @param type character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, or SSCU. Determines the type of boundary link you receive. More on details
 #' @param version character; defaults to the most recent version of geoBoundaries available. The geoboundaries version requested, with underscores.
 #' For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.
 #' @noRd
-get_download_links <- function(country, adm_level, type = NULL, version = NULL)
+get_download_links <- function(country, adm_lvl, type = NULL, version = NULL)
   as.character(gb_metadata(country = country,
-                           adm_level = adm_level,
+                           adm_lvl = adm_lvl,
                            type = type,
                            version = version)[["downloadURL"]])
 

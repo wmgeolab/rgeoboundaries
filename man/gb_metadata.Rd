@@ -4,12 +4,12 @@
 \alias{gb_metadata}
 \title{Get metadata for a country, administrative level, type of data and version}
 \usage{
-gb_metadata(country, adm_level, type = NULL, version = NULL)
+gb_metadata(country, adm_lvl, type = NULL, version = NULL)
 }
 \arguments{
 \item{country}{characher; a vector of country names}
 
-\item{adm_level}{characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. admO being the country.}
+\item{adm_lvl}{characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. admO being the country.}
 
 \item{type}{character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, or SSCU. Determines the type of boundary link you receive. More on details}
 

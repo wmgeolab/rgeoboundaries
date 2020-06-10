@@ -1,6 +1,22 @@
-.Rproj.user/*
-*~
+.Rproj.user
 .Rhistory
-.Rbuildignore
-docs/*
+.RData
+.Ruserdata
+*~
+
+inst/doc
+
+src/*.o
+src/*.so
+src/*.dll
+
+# RStudio files
+.Rproj.user/
+
+# produced vignettes
+vignettes/*.html
+vignettes/*.pdf
+
+#
 README.html
+README_cache/*
