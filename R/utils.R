@@ -157,7 +157,6 @@ extract_shp <- function(zipf, dir) {
 }
 
 #' @noRd
-#' @importFrom webmiddens use_midden
 get_shp_from_links <- function(links) {
   tmpd <- tempdir()
   zipf <- basename(links)
