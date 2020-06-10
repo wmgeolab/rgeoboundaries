@@ -7,6 +7,8 @@
 
 [![GitLab CI Build
 Status](https://gitlab.com/dickoa/rgeoboundaries/badges/master/pipeline.svg)](https://gitlab.com/dickoa/rgeoboundaries/pipelines)
+[![AppVeyor build
+status](https://ci.appveyor.com/api/projects/status/gitlab/dickoa/rgeoboundaries?branch=master&svg=true)](https://ci.appveyor.com/project/dickoa/rgeoboundaries)
 [![Codecov Code
 Coverage](https://codecov.io/gl/dickoa/rgeoboundaries/branch/master/graph/badge.svg)](https://codecov.io/gl/dickoa/rgeoboundaries)
 [![CRAN
