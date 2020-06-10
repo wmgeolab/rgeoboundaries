@@ -35,16 +35,28 @@ remotes::install_gitlab("dickoa/rgeoboundaries")
 ## Access administrative boundaries using rgeoboundaries
 
 This is a basic example which shows you how get Mali and Senegal
-administrative level 1 boundaries and plot it
+boundaries and plot it
 
 ``` r
 library(rgeoboundaries)
 library(sf)
-mli_sen <- gb_adm1(c("mali", "senegal"), type = "sscgs")
+mli_sen <- gb_adm0(c("mali", "senegal"), type = "sscgs")
 plot(st_geometry(mli_sen))
 ```
 
 <img src="man/figures/README-plot-1.svg" width="100%" />
+
+We can also get the first administrative division of all countries in
+the World.
+
+``` r
+egy <- gb_adm1("egypt")
+plot(st_geometry(egy),
+     col = rgb(red = 1, green = 0, blue = 0, alpha = 0.5),
+     axes = TRUE, graticule = TRUE)
+```
+
+<img src="man/figures/README-plot_egy-1.svg" width="100%" />
 
 ``` r
 knitr::kable(gb_metadata(c("mali", "senegal"), "adm1"))

@@ -4,7 +4,8 @@ Version: 0.0.0.9000
 Authors@R: person(given = "Ahmadou", family = "Dicko",
 	          role = c("aut", "cre"),
                   email = "mail@ahmadoudicko.com")
-Description: Client the access data geoBoundaries who provides country political administrative boundaries dataset.
+Description: Client the access data from the geoBoundaries API who provides country
+  political administrative boundaries dataset.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -26,7 +27,5 @@ Suggests:
     rmarkdown,
     testthat,
     covr,
-    webmockr,
-    vcr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0

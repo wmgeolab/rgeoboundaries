@@ -5,7 +5,7 @@
 #' @importFrom sf st_read
 #' @rdname geoboundaries
 #' @param country characher; a vector of country names
-#' @param adm_lvl characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. admO being the country.
+#' @param adm_lvl characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. adm0 being the country.
 #' @param type character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, or SSCU. Determines the type of boundary link you receive. More on details
 #' @param version character; defaults to the most recent version of geoBoundaries available. The geoboundaries version requested, with underscores.
 #' For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.
@@ -46,8 +46,9 @@
 #' @return a `sf` object
 #'
 #' @export
-geoboundaries <- function(country, adm_lvl = "adm0", type = NULL, version = NULL, quiet = TRUE) {
-  links <- get_download_links(country = country,
+geoboundaries <- function(country, adm_lvl = "adm0",
+                          type = NULL, version = NULL, quiet = TRUE) {
+  links <- get_zip_links(country = country,
                               adm_lvl = adm_lvl,
                               type = type,
                               version = version)

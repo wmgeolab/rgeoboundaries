@@ -27,7 +27,6 @@ _dev\.R$
 ^data.Rmd$
 ^covr_performance.Rmd$
 ^revdep$
-^LICENSE$
 ^ci
 ^CRAN-RELEASE$
 ^docs$
@@ -42,3 +41,5 @@ _dev\.R$
 ^CONDUCT\.md$
 ^doc$
 ^Meta$
+^README\.html$
+^LICENSE\.md$

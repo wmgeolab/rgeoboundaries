@@ -33,10 +33,10 @@ assert_version <- function(version = NULL) {
   if (!is.null(version)) {
     if (length(version) >= 2)
       stop("You can't mix differents version of data!")
-    dict <- c("2_0_0", "2_0_1", "3_0_0")
+    dict <- c("2_0_1", "3_0_0")
     cond <- tolower(version) %in% dict
     if (!cond)
-      stop("Not a valid ADMIN type! Use '2_0_0', '2_0_1' or '3_0_0'",
+      stop("Not a valid ADMIN type! Use '2_0_1' or '3_0_0'",
            call. = FALSE)
   }
 }
@@ -127,9 +127,9 @@ build_urls <- function(iso3, adm_lvl,
 gb_metadata <- memoise::memoise(.gb_metadata)
 
 
-#' Get download link for a country, administrative level, type of data and version
+#' Get download link for the zip with data for a country, administrative level, type of data and version
 #'
-#' Get download link for a country, administrative level, type of data and version
+#' Get download link for the zip with data for a country, administrative level, type of data and version
 #'
 #' @param country characher; a vector of country names
 #' @param adm_lvl characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. admO being the country.
@@ -137,16 +137,35 @@ gb_metadata <- memoise::memoise(.gb_metadata)
 #' @param version character; defaults to the most recent version of geoBoundaries available. The geoboundaries version requested, with underscores.
 #' For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.
 #' @noRd
-get_download_links <- function(country, adm_lvl, type = NULL, version = NULL)
+get_zip_links <- function(country, adm_lvl, type = NULL, version = NULL)
   as.character(gb_metadata(country = country,
                            adm_lvl = adm_lvl,
                            type = type,
                            version = version)[["downloadURL"]])
 
 
+
+#' Get the link of the GeoJSON for a country, administrative level, type of data and version
+#'
+#' Get the link of the GeoJSON for a country, administrative level, type of data and version
+#'
+#' @param country characher; a vector of country names
+#' @param adm_lvl characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. adm0 being the country.
+#' @param type character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, or SSCU. Determines the type of boundary link you receive. More on details
+#' @param version character; defaults to the most recent version of geoBoundaries available. The geoboundaries version requested, with underscores.
+#' For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.
+#' @noRd
+get_geojson_links <- function(country, adm_lvl, type = NULL, version = NULL)
+  as.character(gb_metadata(country = country,
+                           adm_lvl = adm_lvl,
+                           type = type,
+                           version = version)[["gjDownloadURL"]])
+
+
 #' @importFrom utils unzip
 #' @noRd
 extract_shp <- function(zipf, dir) {
+
   x <- unzip(zipf, list = TRUE)
   shp <- grep("\\-shp\\.zip$", x$Name, value = TRUE)
   zipfcopy <- file.path(dir, basename(zipf))

@@ -33,7 +33,7 @@ gb_adm5(country, type = NULL, version = NULL, quiet = TRUE)
 \arguments{
 \item{country}{characher; a vector of country names}
 
-\item{adm_lvl}{characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. admO being the country.}
+\item{adm_lvl}{characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. adm0 being the country.}
 
 \item{type}{character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, or SSCU. Determines the type of boundary link you receive. More on details}
 
