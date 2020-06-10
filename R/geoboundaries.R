@@ -47,7 +47,10 @@
 #'
 #' @export
 geoboundaries <- function(country, adm_lvl = "adm0", type = NULL, version = NULL, quiet = TRUE) {
-  links <- get_download_links(country, adm_lvl, type, version)
+  links <- get_download_links(country = country,
+                              adm_lvl = adm_lvl,
+                              type = type,
+                              version = version)
   shps <- get_shp_from_links(links)
   path <- paste0("/vsizip/", shps)
   if (length(country) >= 2) {
@@ -63,7 +66,7 @@ geoboundaries <- function(country, adm_lvl = "adm0", type = NULL, version = NULL
 #' @rdname geoboundaries
 #' @export
 gb_adm0 <- function(country, type = NULL, version = NULL,  quiet = TRUE)
-  geoboundaries(country,
+  geoboundaries(country = country,
                 adm_lvl = "adm0",
                 type = type,
                 version = version,
@@ -72,7 +75,7 @@ gb_adm0 <- function(country, type = NULL, version = NULL,  quiet = TRUE)
 #' @rdname geoboundaries
 #' @export
 gb_adm1 <- function(country, type = NULL, version = NULL, quiet = TRUE)
-  geoboundaries(country,
+  geoboundaries(country = country,
                 adm_lvl = "adm1",
                 type = type,
                 version = version,
@@ -81,7 +84,7 @@ gb_adm1 <- function(country, type = NULL, version = NULL, quiet = TRUE)
 #' @rdname geoboundaries
 #' @export
 gb_adm2 <- function(country, type = NULL, version = NULL, quiet = TRUE)
-  geoboundaries(country,
+  geoboundaries(country = country,
                 adm_lvl = "adm2",
                 type = type,
                 version = version,
@@ -90,7 +93,7 @@ gb_adm2 <- function(country, type = NULL, version = NULL, quiet = TRUE)
 #' @rdname geoboundaries
 #' @export
 gb_adm3 <- function(country, type = NULL, version = NULL, quiet = TRUE)
-  geoboundaries(country,
+  geoboundaries(country = country,
                 adm_lvl = "adm3",
                 type = type,
                 version = version,
@@ -99,7 +102,7 @@ gb_adm3 <- function(country, type = NULL, version = NULL, quiet = TRUE)
 #' @rdname geoboundaries
 #' @export
 gb_adm4 <- function(country, type = NULL, version = NULL, quiet = TRUE)
-  geoboundaries(country,
+  geoboundaries(country = country,
                 adm_lvl = "adm4",
                 type = type,
                 version = version,
@@ -108,7 +111,7 @@ gb_adm4 <- function(country, type = NULL, version = NULL, quiet = TRUE)
 #' @rdname geoboundaries
 #' @export
 gb_adm5 <- function(country, type = NULL, version = NULL, quiet = TRUE)
-  geoboundaries(country,
+  geoboundaries(country = country,
                 adm_lvl = "adm5",
                 type = type,
                 version = version,
