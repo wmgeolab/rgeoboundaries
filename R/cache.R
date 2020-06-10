@@ -39,8 +39,7 @@ NULL
 #' @return the cache directory
 #' @export
 gb_set_cache <- function(path) {
-  assert_cache(rhdx_cache)
-  rhdx_cache$cache_path_set(path)
+  gb_cache$cache_path_set(path)
 }
 
 #' Displays the full path to the cache directory
@@ -72,6 +71,8 @@ gb_clear_cache <- function(force = FALSE) {
 #' List of files available in the cache directory
 #'
 #' @rdname gb_cache
+#'
+#' @param full_path logical; if TRUE returns the full path of the file
 #'
 #' @return list of files in the cache
 #' @export

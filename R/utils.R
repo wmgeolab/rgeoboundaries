@@ -144,6 +144,8 @@ get_download_links <- function(country, adm_level, type = NULL, version = NULL)
                            version = version)[["downloadURL"]])
 
 
+#' @importFrom utils unzip
+#' @noRd
 extract_shp <- function(zipf, dir) {
   x <- unzip(zipf, list = TRUE)
   shp <- grep("\\-shp\\.zip$", x$Name, value = TRUE)

@@ -37,6 +37,9 @@ gb_adm5(country, type = NULL, version = NULL, quiet = TRUE)
 
 \item{type}{character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, or SSCU. Determines the type of boundary link you receive. More on details}
 
+\item{version}{character; defaults to the most recent version of geoBoundaries available. The geoboundaries version requested, with underscores.
+For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.}
+
 \item{quiet}{logical; if TRUE download are quiet. Default to FALSE}
 }
 \value{

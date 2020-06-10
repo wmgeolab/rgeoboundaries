@@ -26,6 +26,8 @@ gb_delete_from_cache(file)
 
 \item{force}{logical; force delete. default: \code{FALSE}}
 
+\item{full_path}{logical; if TRUE returns the full path of the file}
+
 \item{file}{Character, the file to delete}
 }
 \value{

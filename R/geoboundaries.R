@@ -7,6 +7,8 @@
 #' @param country characher; a vector of country names
 #' @param adm_lvl characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. admO being the country.
 #' @param type character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, or SSCU. Determines the type of boundary link you receive. More on details
+#' @param version character; defaults to the most recent version of geoBoundaries available. The geoboundaries version requested, with underscores.
+#' For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.
 #' @param quiet logical; if TRUE download are quiet. Default to FALSE
 #'
 #' @details
@@ -47,7 +49,7 @@
 geoboundaries <- function(country, adm_lvl = "adm0", type = NULL, version = NULL, quiet = TRUE) {
   links <- get_download_links(country, adm_lvl, type, version)
   shps <- get_shp_from_links(links)
-  path <- file.path("/vsizip/", shps)
+  path <- paste0("/vsizip/", shps)
   if (length(country) >= 2) {
     l <- lapply(seq_along(links), function(i)
       sf::st_read(path[i], quiet = quiet))
