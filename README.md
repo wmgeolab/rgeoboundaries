@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# rgeoboundaries
+# rgeoboundaries <img src="man/figures/hex-rgeoboundaries.png" align="right" height="139" />
 
 <!-- badges: start -->
 

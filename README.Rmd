@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# rgeoboundaries
+# rgeoboundaries <img src="man/figures/hex-rgeoboundaries.png" align="right" height="139" />
 
 <!-- badges: start -->
 
