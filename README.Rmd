@@ -30,7 +30,7 @@ knitr::opts_chunk$set(
 
 ## Installation
 
-You can install the development  version of rgeoboundaries using the `remotes` package:
+You can install the development version of rgeoboundaries using the `remotes` package:
 
 ``` {r, eval = FALSE}
 # install.packages("remotes")

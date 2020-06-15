@@ -6,7 +6,6 @@ drop_nulls <- function(x)
   Filter(Negate(is.null), x)
 
 #' @noRd
-#' @noRd
 #' @importFrom countrycode countryname
 country_to_iso3 <- function(country) {
   iso3 <- countrycode::countryname(country, destination = "iso3c")
