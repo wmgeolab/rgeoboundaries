@@ -60,10 +60,10 @@ geoboundaries <- function(country, adm_lvl = "adm0",
   path <- paste0("/vsizip/", shps)
   if (length(country) >= 2) {
     l <- lapply(seq_along(links), function(i)
-      sf::st_read(path[i], quiet = quiet))
+      sf::st_read(path[i], quiet = quiet, options = "ENCODING=WINDOWS-1252"))
     res <- do.call(rbind, l)
   } else {
-    res <- sf::st_read(path, quiet = quiet)
+    res <- sf::st_read(path, quiet = quiet, options = "ENCODING=WINDOWS-1252")
   }
   res
 }
