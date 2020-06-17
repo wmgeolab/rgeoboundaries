@@ -20,3 +20,6 @@ vignettes/*.pdf
 #
 README.html
 README_cache/*
+
+#
+data-raw/*
