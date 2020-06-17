@@ -58,6 +58,8 @@ plot(st_geometry(egy),
 
 <img src="man/figures/README-plot_egy-1.svg" width="100%" />
 
+Metadata for each country and administrative level are also available.
+
 ``` r
 knitr::kable(gb_metadata(c("mali", "senegal"), "adm1"))
 ```
@@ -72,6 +74,7 @@ knitr::kable(gb_metadata(c("mali", "senegal"), "adm1"))
 If you are using this package in your analysis, please cite the original
 `geoBoundaries` work:
 
-> Runfola, D., Seitz, L., Hobbs, L., Panginaban, J., Oberman, R. et
-> al. geoBoundaries Global Administrative Database.
-> <http://www.geoboundaries.org>.
+> Runfola D, Anderson A, Baier H, Crittenden M, Dowker E, Fuhrig S, et
+> al. (2020) geoBoundaries: A global database of political
+> administrative boundaries. PLoS ONE 15(4): e0231866.
+> <https://doi.org/10.1371/journal.pone.0231866>
