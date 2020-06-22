@@ -21,3 +21,15 @@ test_that("Downloaded data are cached", {
   p <- gb_adm0(country = "Mali")
   expect_gte(length(gb_list_cache()), 1)
 })
+
+test_that("ISO3 also works!", {
+  p1 <- gb_adm0(country = "algeria")
+  p2 <- gb_adm0(country = "dza")
+  expect_equal(p1, p2)
+})
+
+test_that("Global data is obtained with type cgaz or no country", {
+  p1 <- gb_adm0()
+  p2 <- gb_adm0("mali", type = "cgaz")
+  expect_equal(p1, p2)
+})

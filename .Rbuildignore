@@ -43,3 +43,4 @@ _dev\.R$
 ^Meta$
 ^README\.html$
 ^LICENSE\.md$
+^data\-raw/*

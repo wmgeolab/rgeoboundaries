@@ -4,19 +4,23 @@
 #'
 #' @importFrom sf st_read
 #' @rdname geoboundaries
-#' @param country characher; a vector of country names
+#' @param country characher; a vector of country names or country ISO3. If NULL all countries will be used
+#'  for adm0, adm1, adm2 where the administrative level are available
 #' @param adm_lvl characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. adm0 being the country.
-#' @param type character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, or SSCU. Determines the type of boundary link you receive. More on details
-#' @param version character; defaults to the most recent version of geoBoundaries available. The geoboundaries version requested, with underscores.
-#' For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.
-#' @param quiet logical; if TRUE download are quiet. Default to FALSE
+#' @param type character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, SSCU or CGAZ.
+#'  Determines the type of boundary link you receive. More on details
+#' @param version character; defaults to the most recent version of geoBoundaries available.
+#'  The geoboundaries version requested, with underscores. For example, 3_0_0 would return data
+#'  from version 3.0.0 of geoBoundaries.
+#' @param quiet logical; if TRUE no message while downloading and reading the data. Default to FALSE
 #'
 #' @details
 #' Different types to of boundaries available:
 #'
 #' * HPSCU - High Precision Single Country Unstadardized. The premier geoBoundaries release,
 #'   representing the highest precision files available for every country in the world.
-#'   No standardization is performed on these files, so (for example) two countries may overlap in the case of contested boundaries.
+#'   No standardization is performed on these files, so (for example) two countries
+#'   may overlap in the case of contested boundaries.
 #'
 #' * HPSCGS - High Precision Single Country Globally Standardized. A version of geoBoundaries
 #'   high precision data that has been clipped to the U.S. Department of State boundary file,
@@ -50,27 +54,34 @@
 #' @return a `sf` object
 #'
 #' @export
-geoboundaries <- function(country, adm_lvl = "adm0",
+geoboundaries <- function(country = NULL, adm_lvl = "adm0",
                           type = NULL, version = NULL, quiet = TRUE) {
-  links <- get_zip_links(country = country,
-                              adm_lvl = adm_lvl,
-                              type = type,
-                              version = version)
-  shps <- get_shp_from_links(links)
-  path <- paste0("/vsizip/", shps)
-  if (length(country) >= 2) {
-    l <- lapply(seq_along(links), function(i)
-      sf::st_read(path[i], quiet = quiet, options = "ENCODING=WINDOWS-1252"))
-    res <- do.call(rbind, l)
+  if (is.null(country) || (!is.null(type) && tolower(type) == "cgaz")) {
+    path <- get_cgaz_topojson_link(adm_lvl, quiet = quiet)
+    res <- sf::st_read(path, crs = 4326, quiet = quiet)
   } else {
-    res <- sf::st_read(path, quiet = quiet, options = "ENCODING=WINDOWS-1252")
+    links <- get_zip_links(country = country,
+                           adm_lvl = adm_lvl,
+                           type = type,
+                           version = version)
+    shps <- get_shp_from_links(links)
+    path <- paste0("/vsizip/", shps)
+
+    if (length(country) >= 2) {
+      l <- lapply(seq_along(links), function(i)
+        sf::st_read(path[i], quiet = quiet, options = "ENCODING=WINDOWS-1252"))
+      res <- do.call(rbind, l)
+    } else {
+      res <- sf::st_read(path, quiet = quiet, options = "ENCODING=WINDOWS-1252")
+    }
   }
   res
 }
 
+
 #' @rdname geoboundaries
 #' @export
-gb_adm0 <- function(country, type = NULL, version = NULL,  quiet = TRUE)
+gb_adm0 <- function(country = NULL, type = NULL, version = NULL,  quiet = TRUE)
   geoboundaries(country = country,
                 adm_lvl = "adm0",
                 type = type,
@@ -79,7 +90,7 @@ gb_adm0 <- function(country, type = NULL, version = NULL,  quiet = TRUE)
 
 #' @rdname geoboundaries
 #' @export
-gb_adm1 <- function(country, type = NULL, version = NULL, quiet = TRUE)
+gb_adm1 <- function(country = NULL, type = NULL, version = NULL, quiet = TRUE)
   geoboundaries(country = country,
                 adm_lvl = "adm1",
                 type = type,
@@ -88,7 +99,7 @@ gb_adm1 <- function(country, type = NULL, version = NULL, quiet = TRUE)
 
 #' @rdname geoboundaries
 #' @export
-gb_adm2 <- function(country, type = NULL, version = NULL, quiet = TRUE)
+gb_adm2 <- function(country = NULL, type = NULL, version = NULL, quiet = TRUE)
   geoboundaries(country = country,
                 adm_lvl = "adm2",
                 type = type,

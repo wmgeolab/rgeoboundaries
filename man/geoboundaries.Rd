@@ -11,18 +11,18 @@
 \title{Get the administrative boundaries of selected countries}
 \usage{
 geoboundaries(
-  country,
+  country = NULL,
   adm_lvl = "adm0",
   type = NULL,
   version = NULL,
   quiet = TRUE
 )
 
-gb_adm0(country, type = NULL, version = NULL, quiet = TRUE)
+gb_adm0(country = NULL, type = NULL, version = NULL, quiet = TRUE)
 
-gb_adm1(country, type = NULL, version = NULL, quiet = TRUE)
+gb_adm1(country = NULL, type = NULL, version = NULL, quiet = TRUE)
 
-gb_adm2(country, type = NULL, version = NULL, quiet = TRUE)
+gb_adm2(country = NULL, type = NULL, version = NULL, quiet = TRUE)
 
 gb_adm3(country, type = NULL, version = NULL, quiet = TRUE)
 
@@ -31,16 +31,19 @@ gb_adm4(country, type = NULL, version = NULL, quiet = TRUE)
 gb_adm5(country, type = NULL, version = NULL, quiet = TRUE)
 }
 \arguments{
-\item{country}{characher; a vector of country names}
+\item{country}{characher; a vector of country names or country ISO3. If NULL all countries will be used
+for adm0, adm1, adm2 where the administrative level are available}
 
 \item{adm_lvl}{characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. adm0 being the country.}
 
-\item{type}{character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, or SSCU. Determines the type of boundary link you receive. More on details}
+\item{type}{character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, SSCU or CGAZ.
+Determines the type of boundary link you receive. More on details}
 
-\item{version}{character; defaults to the most recent version of geoBoundaries available. The geoboundaries version requested, with underscores.
-For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.}
+\item{version}{character; defaults to the most recent version of geoBoundaries available.
+The geoboundaries version requested, with underscores. For example, 3_0_0 would return data
+from version 3.0.0 of geoBoundaries.}
 
-\item{quiet}{logical; if TRUE download are quiet. Default to FALSE}
+\item{quiet}{logical; if TRUE no message while downloading and reading the data. Default to FALSE}
 }
 \value{
 a \code{sf} object
@@ -53,7 +56,8 @@ Different types to of boundaries available:
 \itemize{
 \item HPSCU - High Precision Single Country Unstadardized. The premier geoBoundaries release,
 representing the highest precision files available for every country in the world.
-No standardization is performed on these files, so (for example) two countries may overlap in the case of contested boundaries.
+No standardization is performed on these files, so (for example) two countries
+may overlap in the case of contested boundaries.
 \item HPSCGS - High Precision Single Country Globally Standardized. A version of geoBoundaries
 high precision data that has been clipped to the U.S. Department of State boundary file,
 ensuring no contested boundaries or overlap in the dataset. This globally standardized

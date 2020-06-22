@@ -30,6 +30,7 @@ You can install the development version of rgeoboundaries using the
 ``` r
 # install.packages("remotes")
 remotes::install_gitlab("dickoa/rgeoboundaries")
+remotes::install_github("wmgeolab/rgeoboundaries")
 ```
 
 ## Access administrative boundaries using rgeoboundaries
@@ -47,10 +48,10 @@ plot(st_geometry(mli_sen))
 <img src="man/figures/README-plot-1.svg" width="100%" />
 
 We can also get the first administrative division of all countries in
-the World.
+the world and use ISO3 code too
 
 ``` r
-egy <- gb_adm1("egypt")
+egy <- gb_adm1("EGY")
 plot(st_geometry(egy),
      col = rgb(red = 1, green = 0, blue = 0, alpha = 0.5),
      axes = TRUE, graticule = TRUE)
@@ -58,7 +59,23 @@ plot(st_geometry(egy),
 
 <img src="man/figures/README-plot_egy-1.svg" width="100%" />
 
-Metadata for each country and administrative level are also available.
+In order to access the global administrative zones, you just need to
+skip the country argument (i.e set it to `NULL`) or specify `type =
+"CGAZ"`.
+
+``` r
+wrld <- gb_adm1()
+world_lambert <- st_transform(adm1, "+proj=laea +x_0=0 +y_0=0 +lon_0=0 +lat_0=0")
+par(bty = "n")
+plot(st_geometry(world_lambert),
+     col = "#E39d57",
+     graticule = TRUE, lwd = 0.3)
+```
+
+<img src="man/figures/README-plot_world-1.svg" width="100%" />
+
+Finally, metadata for each country and administrative level are also
+available.
 
 ``` r
 knitr::kable(gb_metadata(c("mali", "senegal"), "adm1"))
