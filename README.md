@@ -64,8 +64,8 @@ skip the country argument (i.e set it to `NULL`) or specify `type =
 "CGAZ"`.
 
 ``` r
-wrld <- gb_adm1()
-world_lambert <- st_transform(adm1, "+proj=laea +x_0=0 +y_0=0 +lon_0=0 +lat_0=0")
+world <- gb_adm1()
+world_lambert <- st_transform(world, "+proj=laea +x_0=0 +y_0=0 +lon_0=0 +lat_0=0")
 par(bty = "n")
 plot(st_geometry(world_lambert),
      col = "#E39d57",
