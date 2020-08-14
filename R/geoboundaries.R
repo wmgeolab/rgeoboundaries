@@ -1,8 +1,24 @@
+#' @importFrom sf st_read
+#' @noRd
+.read_gb <- function(path, quiet = TRUE, options) {
+  if (length(path) >= 2) {
+      l <- lapply(seq_along(path), function(i)
+        st_read(path[i], quiet = quiet, options = options))
+      res <- do.call(rbind, l)
+  } else {
+      res <- st_read(path, quiet = quiet, options = options)
+  }
+  res
+}
+
+#' @noRd
+#' @importFrom memoise memoise
+read_gb <- memoise(.read_gb)
+
 #' Get the administrative boundaries of selected countries
 #'
 #' Access country boundaries at a specified administrative level
 #'
-#' @importFrom sf st_read
 #' @rdname geoboundaries
 #' @param country characher; a vector of country names or country ISO3. If NULL all countries will be used
 #'  for adm0, adm1, adm2 where the administrative level are available
@@ -57,8 +73,8 @@
 geoboundaries <- function(country = NULL, adm_lvl = "adm0",
                           type = NULL, version = NULL, quiet = TRUE) {
   if (is.null(country) || (!is.null(type) && tolower(type) == "cgaz")) {
-    path <- get_cgaz_topojson_link(adm_lvl, quiet = quiet)
-    res <- sf::st_read(path, crs = 4326, quiet = quiet)
+    path <- get_cgaz_shp_link(adm_lvl, quiet = quiet)
+    res <- read_gb(path, quiet = quiet, options = NULL)
   } else {
     links <- get_zip_links(country = country,
                            adm_lvl = adm_lvl,
@@ -66,14 +82,7 @@ geoboundaries <- function(country = NULL, adm_lvl = "adm0",
                            version = version)
     shps <- get_shp_from_links(links)
     path <- paste0("/vsizip/", shps)
-
-    if (length(country) >= 2) {
-      l <- lapply(seq_along(links), function(i)
-        sf::st_read(path[i], quiet = quiet, options = "ENCODING=WINDOWS-1252"))
-      res <- do.call(rbind, l)
-    } else {
-      res <- sf::st_read(path, quiet = quiet, options = "ENCODING=WINDOWS-1252")
-    }
+    res <- read_gb(path, quiet = quiet, options = "ENCODING=WINDOWS-1252")
   }
   res
 }
