@@ -44,3 +44,4 @@ _dev\.R$
 ^README\.html$
 ^LICENSE\.md$
 ^data\-raw/*
+^inst/*

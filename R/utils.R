@@ -9,10 +9,12 @@ drop_nulls <- function(x)
 #' @importFrom countrycode countryname
 country_to_iso3 <- function(country) {
   if (!is.null(country)) {
-
-    if (nchar(country) >= 4) {
-      iso3 <- countrycode::countryname(country,
+    ind <- nchar(country) >= 4
+    if (any(ind)) {
+      iso3 <- countrycode::countryname(country[ind],
                                        destination = "iso3c")
+      iso3 <- c(country[!ind], iso3)
+
     } else {
       iso3  <- suppressWarnings(countrycode::countrycode(country,
                                                          origin = "iso3c",
@@ -83,6 +85,7 @@ build_urls <- function(iso3, adm_lvl,
   l <- lapply(drop_nulls(l), toupper)
   template_url <- paste0(baseurl(),
                          create_query(names(l)))
+
   glue::glue_data(l, template_url)
 }
 
