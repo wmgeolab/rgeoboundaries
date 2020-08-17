@@ -141,8 +141,7 @@ build_urls <- function(iso3, adm_lvl,
 #' For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.
 #' @rdname gb_metadata
 #' @importFrom memoise memoise
-#' @export
-gb_metadata <- memoise(.gb_metadata)
+gb_meta <- memoise(.gb_metadata)
 
 #' Get download link for the zip with data for a country, administrative level, type of data and version
 #'
@@ -157,10 +156,10 @@ gb_metadata <- memoise(.gb_metadata)
 #' For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.
 #' @noRd
 get_zip_links <- function(country = NULL, adm_lvl, type = NULL, version = NULL)
-  as.character(gb_metadata(country = country,
-                           adm_lvl = adm_lvl,
-                           type = type,
-                           version = version)[["downloadURL"]])
+  as.character(gb_meta(country = country,
+                       adm_lvl = adm_lvl,
+                       type = type,
+                       version = version)[["downloadURL"]])
 
 
 #' Get the link of the GeoJSON for a country, administrative level, type of data and version
@@ -176,10 +175,10 @@ get_zip_links <- function(country = NULL, adm_lvl, type = NULL, version = NULL)
 #' For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.
 #' @noRd
 get_geojson_links <- function(country = NULL, adm_lvl, type = NULL, version = NULL)
-  as.character(gb_metadata(country = country,
-                           adm_lvl = adm_lvl,
-                           type = type,
-                           version = version)[["gjDownloadURL"]])
+  as.character(gb_meta(country = country,
+                       adm_lvl = adm_lvl,
+                       type = type,
+                       version = version)[["gjDownloadURL"]])
 
 #' @noRd
 #' @importFrom utils download.file
