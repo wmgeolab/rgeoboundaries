@@ -14,7 +14,7 @@ Determines the type of boundary link you receive. More on details}
 
 \item{version}{character; defaults to the most recent version of geoBoundaries available.}
 
-\item{adm_lvl}{characher; administrative level, adm0, adm1, adm2, adm3, adm4, adm5 or all. adm0 being the country and all to access all available levels.}
+\item{license}{character; the license of the maximum administrative level}
 }
 \value{
 a data.frame with the country names and corresponding highest administrative level

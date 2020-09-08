@@ -176,11 +176,11 @@ gb_metadata <- function(country = NULL, adm_lvl = "all", type = NULL, version = 
 #'
 #' @importFrom countrycode countrycode
 #'
-#' @param adm_lvl characher; administrative level, adm0, adm1, adm2, adm3, adm4, adm5 or all. adm0 being the country and all to access all available levels.
 #' @param country characher; a vector of country names or iso3 country code.
 #' @param type character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, or SSCU.
 #'  Determines the type of boundary link you receive. More on details
 #' @param version character; defaults to the most recent version of geoBoundaries available.
+#' @param license character; the license of the maximum administrative level
 #'
 #' @return a data.frame with the country names and corresponding highest administrative level
 #' @export
