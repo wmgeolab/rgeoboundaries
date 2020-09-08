@@ -34,7 +34,7 @@ gb_adm5(country, type = NULL, version = NULL, quiet = TRUE)
 \item{country}{characher; a vector of country names or country ISO3. If NULL all countries will be used
 for adm0, adm1, adm2 where the administrative level are available}
 
-\item{adm_lvl}{characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. adm0 being the country.}
+\item{adm_lvl}{characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. adm0 being the country boundary. 0, 1, 2, 3, 4 or 5 can also be used.}
 
 \item{type}{character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, SSCU or CGAZ.
 Determines the type of boundary link you receive. More on details}

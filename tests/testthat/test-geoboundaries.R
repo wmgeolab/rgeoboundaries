@@ -33,3 +33,15 @@ test_that("Global data is obtained with type cgaz or no country", {
   p2 <- gb_adm0("mali", type = "cgaz")
   expect_equal(p1, p2)
 })
+
+test_that("adm_lvl can be any of the characters '0', ..., '5'", {
+  p1 <- geoboundaries("benin", adm_lvl = "1")
+  p2 <- geoboundaries("benin", adm_lvl = "adm1")
+  expect_equal(p1, p2)
+})
+
+test_that("adm_lvl can be an integer between 0 and 5", {
+  p1 <- geoboundaries("benin", adm_lvl = 0)
+  p2 <- geoboundaries("benin", adm_lvl = "adm0")
+  expect_equal(p1, p2)
+})

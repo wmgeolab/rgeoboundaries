@@ -89,16 +89,18 @@ build_urls <- function(iso3, adm_lvl,
   glue_data(l, template_url)
 }
 
-#' @rdname gb_metadata
+#' @rdname gb_meta
 #' @importFrom crul Async HttpClient
 #' @importFrom jsonlite fromJSON
 #' @noRd
-.gb_metadata <- function(country = NULL, adm_lvl, type = NULL, version = NULL) {
+.gb_meta <- function(country = NULL, adm_lvl, type = NULL, version = NULL) {
 
   iso3 <- country_to_iso3(country)
-  assert_adm_lvl(adm_lvl)
   assert_type(type)
   assert_version(version)
+
+  if (grepl("^[0-5]$", adm_lvl))
+    adm_lvl <- paste0("ADM", adm_lvl)
 
   if (length(iso3) >= 2) {
     urls <- build_urls(iso3, adm_lvl, type, version)
@@ -107,11 +109,11 @@ build_urls <- function(iso3, adm_lvl,
     l <- lapply(seq_along(l), function(i) {
       r <- l[[i]]
       r <- r$parse(encoding = "UTF-8")
-      r <- fromJSON(r, simplifyVector = FALSE)
+      r <- fromJSON(r)
       if (length(r) == 0)
         warning(paste(toupper(adm_lvl),
                       "not available for", country[i]), call. = TRUE)
-      as.data.frame(r)
+      r
     })
     do.call(rbind, l)
   } else {
@@ -121,10 +123,10 @@ build_urls <- function(iso3, adm_lvl,
                                  TYP = toupper(type),
                                  VER = toupper(version)))
     res <- res$parse(encoding = "UTF-8")
-    res <- fromJSON(res, simplifyVector = FALSE)
+    res <- fromJSON(res)
     if (length(res) == 0)
       stop(paste(toupper(adm_lvl), "not available for", country))
-    as.data.frame(res)
+    res
   }
 }
 
@@ -132,16 +134,75 @@ build_urls <- function(iso3, adm_lvl,
 #'
 #' Get metadata for a country and an administrative level
 #'
-#' @param adm_lvl characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. adm0 being the country.
+#' @param adm_lvl characher or integer; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. adm0 being the country. 0, 1, 2, 3, 4 or 5 can also be used.
 #' @param country characher; a vector of country names
+#' @param type character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, or SSCU.
+#'  Determines the type of boundary link you receive. More on details
+#' @param version character; defaults to the most recent version of geoBoundaries available.
+#'  The geoboundaries version requested, with underscores.
+#' For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.
+#' @rdname gb_meta
+#' @importFrom memoise memoise
+#' @noRd
+gb_meta <- memoise(.gb_meta)
+
+
+#' Get metadata for a country, administrative level, type of data and version
+#'
+#' Get metadata for a country and an administrative level, type of data and version
+#'
+#' @param adm_lvl characher; administrative level, adm0, adm1, adm2, adm3, adm4, adm5 or all. adm0 being the country and all to access all available levels.
+#' @param country characher; a vector of country names or iso3 country code.
 #' @param type character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, or SSCU.
 #'  Determines the type of boundary link you receive. More on details
 #' @param version character; defaults to the most recent version of geoBoundaries available.
 #'  The geoboundaries version requested, with underscores.
 #' For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.
 #' @rdname gb_metadata
-#' @importFrom memoise memoise
-gb_meta <- memoise(.gb_metadata)
+#' @export
+gb_metadata <- function(country = NULL, adm_lvl = "all", type = NULL, version = NULL) {
+  assert_adm_lvl(adm_lvl, c("all", paste0("adm", 0:5), 0:5))
+  gb_meta(country = country,
+          adm_lvl = adm_lvl,
+          type = type,
+          version = version)
+}
+
+
+
+#' Get the highest administrative level available for a given country
+#'
+#' Get the highest administrative level available for a given country
+#'
+#' @importFrom countrycode countrycode
+#'
+#' @param adm_lvl characher; administrative level, adm0, adm1, adm2, adm3, adm4, adm5 or all. adm0 being the country and all to access all available levels.
+#' @param country characher; a vector of country names or iso3 country code.
+#' @param type character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, or SSCU.
+#'  Determines the type of boundary link you receive. More on details
+#' @param version character; defaults to the most recent version of geoBoundaries available.
+#'
+#' @return a data.frame with the country names and corresponding highest administrative level
+#' @export
+gb_max_adm_lvl <- function(country = NULL, type = NULL,
+                           version = NULL, license = NULL) {
+  ord <- country_to_iso3(country)
+  df <- gb_meta(country = country,
+                adm_lvl = "all",
+                type = type,
+                version = version)
+  available_licenses <- unique(df$boundaryLicense)
+  if (!is.null(license)) {
+    stopifnot("License not available!" = license %in% available_licenses)
+    df <- df[df$boundaryLicense == license, ]
+  }
+
+  res <- tapply(df$boundaryType, df$boundaryISO, max)
+  res <- res[toupper(ord)]
+  res <- as.integer(gsub("[^0-5]", "", res))
+  names(res) <- country
+  res
+}
 
 #' Get download link for the zip with data for a country, administrative level, type of data and version
 #'
@@ -155,59 +216,23 @@ gb_meta <- memoise(.gb_metadata)
 #'  The geoboundaries version requested, with underscores.
 #' For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.
 #' @noRd
-get_zip_links <- function(country = NULL, adm_lvl, type = NULL, version = NULL)
-  as.character(gb_meta(country = country,
-                       adm_lvl = adm_lvl,
-                       type = type,
-                       version = version)[["downloadURL"]])
-
-
-#' Get the link of the GeoJSON for a country, administrative level, type of data and version
-#'
-#' Get the link of the GeoJSON for a country, administrative level, type of data and version
-#'
-#' @param country characher; a vector of country names
-#' @param adm_lvl characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. adm0 being the country.
-#' @param type character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, or SSCU.
-#'   Determines the type of boundary link you receive. More on details
-#' @param version character; defaults to the most recent version of geoBoundaries available.
-#'   The geoboundaries version requested, with underscores.
-#' For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.
-#' @noRd
-get_geojson_links <- function(country = NULL, adm_lvl, type = NULL, version = NULL)
-  as.character(gb_meta(country = country,
-                       adm_lvl = adm_lvl,
-                       type = type,
-                       version = version)[["gjDownloadURL"]])
-
-#' @noRd
-#' @importFrom utils download.file
-get_cgaz_topojson_link <- function(adm_lvl = "adm0", quiet = TRUE) {
-  assert_adm_lvl(adm_lvl, paste0("adm", 0:2))
-  adm_lvl <- tolower(adm_lvl)
-  base_url <- "https://www.geoboundaries.org/data/geoBoundariesCGAZ-3_0_0/"
-  url <- switch(adm_lvl,
-                adm0 = paste0(base_url,
-                              "ADM0/simplifyRatio_25/geoBoundariesCGAZ_ADM0.topojson"),
-                adm1 = paste0(base_url,
-                              "ADM1/simplifyRatio_25/geoBoundariesCGAZ_ADM1.topojson"),
-                adm2 = paste0(base_url,
-                              "ADM2/simplifyRatio_25/geoBoundariesCGAZ_ADM2.topojson"))
-  cache_dir <- gb_get_cache(create = TRUE)
-  file <- basename(url)
-  path <- file.path(cache_dir, file)
-  if (!file %in% list.files(cache_dir))
-    download.file(url,
-                  destfile = path,
-                  quiet = quiet)
-  path
+get_zip_links <- function(country = NULL, adm_lvl, type = NULL, version = NULL) {
+  assert_adm_lvl(adm_lvl, c(paste0("adm", 0:5), 0:5))
+  l <- gb_meta(country = country,
+               adm_lvl = adm_lvl,
+               type = type,
+               version = version)[["downloadURL"]]
+  as.character(l)
 }
-
 
 #' @noRd
 #' @importFrom utils download.file
 get_cgaz_shp_link <- function(adm_lvl = "adm0", quiet = TRUE) {
-  assert_adm_lvl(adm_lvl, paste0("adm", 0:2))
+  assert_adm_lvl(adm_lvl, c(paste0("adm", 0:2), 0:2))
+
+  if (grepl("^[0-2]$", adm_lvl))
+    adm_lvl <- paste0("adm", adm_lvl)
+
   adm_lvl <- tolower(adm_lvl)
   base_url <- "https://www.geoboundaries.org/data/geoBoundariesCGAZ-3_0_0/"
   url_root <- switch(adm_lvl,

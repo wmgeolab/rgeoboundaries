@@ -22,7 +22,7 @@ read_gb <- memoise(.read_gb)
 #' @rdname geoboundaries
 #' @param country characher; a vector of country names or country ISO3. If NULL all countries will be used
 #'  for adm0, adm1, adm2 where the administrative level are available
-#' @param adm_lvl characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. adm0 being the country.
+#' @param adm_lvl characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. adm0 being the country boundary. 0, 1, 2, 3, 4 or 5 can also be used.
 #' @param type character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, SSCU or CGAZ.
 #'  Determines the type of boundary link you receive. More on details
 #' @param version character; defaults to the most recent version of geoBoundaries available.
@@ -87,7 +87,6 @@ geoboundaries <- function(country = NULL, adm_lvl = "adm0",
   res
 }
 
-
 #' @rdname geoboundaries
 #' @export
 gb_adm0 <- function(country = NULL, type = NULL, version = NULL,  quiet = TRUE)
@@ -141,39 +140,3 @@ gb_adm5 <- function(country, type = NULL, version = NULL, quiet = TRUE)
                 type = type,
                 version = version,
                 quiet = quiet)
-
-
-#' Get metadata for a country, administrative level and version
-#'
-#' Get metadata for a country, administrative level and version
-#'
-#' @param country characher; a vector of country names or country ISO3 code.
-#' If NULL all countries will be used
-#'  for adm0, adm1, adm2 where the administrative level are available
-#' @param adm_lvl characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5.
-#' adm0 being the country.
-#' @param version character; defaults to the most recent version of geoBoundaries available.
-#' The geoboundaries version requested, with underscores.
-#' For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.
-#'
-#' @return a `data.frame` with metadata
-#' @export
-gb_metadata <- function(country, adm_lvl = "adm0", version = "3_0_0") {
-
-  iso3 <- country_to_iso3(country)
-  assert_adm_lvl(adm_lvl, c("all", paste0("adm", 0:5)))
-  assert_version(version)
-  adm_lvl <- toupper(adm_lvl)
-
-  if (adm_lvl == "ALL") {
-    res <- subset(geoboundaries_meta,
-                  boundaryISO %in% toupper(iso3) &
-                    boundaryVersion == version)
-  } else {
-    res <- subset(geoboundaries_meta,
-                  boundaryISO %in% toupper(iso3) &
-                    boundaryType %in% adm_lvl &
-                      boundaryVersion == version)
-  }
-  res
-}
