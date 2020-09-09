@@ -82,10 +82,15 @@ geoboundaries <- function(country = NULL, adm_lvl = "adm0",
                            version = version)
     shps <- get_shp_from_links(links)
     path <- paste0("/vsizip/", shps)
-    res <- read_gb(path, quiet = quiet, options = "ENCODING=WINDOWS-1252")
+    #andys temporary patch to fix encoding differences in geoboundaries
+    encoding  <-  "WINDOWS-1252"
+    if (!is.null(type) && tolower(type) != "hpscu")
+      encoding <- "UTF-8"
+    res <- read_gb(path, quiet = quiet, options = paste0("ENCODING=",encoding) )
   }
   res
 }
+
 
 #' @rdname geoboundaries
 #' @export

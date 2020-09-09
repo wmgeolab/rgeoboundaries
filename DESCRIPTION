@@ -1,9 +1,12 @@
 Package: rgeoboundaries
 Title: A Client to geoBoundaries, A Political Administrative Boundaries Dataset
 Version: 0.0.0.9000
-Authors@R: person(given = "Ahmadou", family = "Dicko",
+Authors@R: c(person(given = "Ahmadou", family = "Dicko",
 	          role = c("aut", "cre"),
-                  email = "mail@ahmadoudicko.com")
+                  email = "mail@ahmadoudicko.com"),
+             person(given = "Andy", family = "South",
+		  email = "southandy@gmail.com",
+		  role = "ctb"))
 Description: Client the access data from the geoBoundaries API who provides country
   political administrative boundaries dataset.
 License: MIT + file LICENSE
