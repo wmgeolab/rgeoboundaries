@@ -31,7 +31,7 @@ country_to_iso3 <- function(country) {
 #' @noRd
 assert_adm_lvl <- function(adm_lvl, dict = paste0("adm", 0:5)) {
   if (length(adm_lvl) >= 2)
-    stop("You can't mix differents administrative level!")
+    stop("You can't mix different administrative levels!")
   cond <- tolower(adm_lvl) %in% dict
   if (!cond)
     stop(paste("Not a valid ADMIN level code! Use",
@@ -43,7 +43,7 @@ assert_adm_lvl <- function(adm_lvl, dict = paste0("adm", 0:5)) {
 assert_version <- function(version = NULL) {
   if (!is.null(version)) {
     if (length(version) >= 2)
-      stop("You can't mix differents version of data!")
+      stop("You can't mix different versions of data!")
     dict <- c("2_0_1", "3_0_0")
     cond <- tolower(version) %in% dict
     if (!cond)
@@ -56,7 +56,7 @@ assert_version <- function(version = NULL) {
 assert_type <- function(type = NULL) {
   if (!is.null(type)) {
     if (length(type) >= 2)
-      stop("You can't mix differents type!")
+      stop("You can't mix different types!")
     dict <- c("HPSCU", "HPSCU", "HPSCGS", "SSCGS", "SSCU", "CGAZ")
     cond <- toupper(type) %in% dict
     if (!cond)
