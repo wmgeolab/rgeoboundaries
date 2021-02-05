@@ -19,6 +19,9 @@ read_gb <- memoise(.read_gb)
 #'
 #' Access country boundaries at a specified administrative level
 #'
+#'
+#' @importFrom tools file_path_as_absolute
+#'
 #' @rdname geoboundaries
 #' @param country characher; a vector of country names or country ISO3. If NULL all countries will be used
 #'  for adm0, adm1, adm2 where the administrative level are available
@@ -81,7 +84,8 @@ geoboundaries <- function(country = NULL, adm_lvl = "adm0",
                            type = type,
                            version = version)
     shps <- get_shp_from_links(links)
-    path <- paste0("/vsizip/", shps)
+    shps <- vapply(shps, file_path_as_absolute, character(1))
+    path <- file.path("/vsizip", shps)
     #andys temporary patch to fix encoding differences in geoboundaries
     encoding  <-  "WINDOWS-1252"
     if (!is.null(type) && tolower(type) != "hpscu")
