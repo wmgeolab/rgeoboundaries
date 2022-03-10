@@ -25,7 +25,7 @@ read_gb <- memoise(.read_gb)
 #' @rdname geoboundaries
 #' @param country characher; a vector of country names or country ISO3. If NULL all countries will be used
 #'  for adm0, adm1, adm2 where the administrative level are available
-#' @param adm_lvl characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. adm0 being the country boundary. 0, 1, 2, 3, 4 or 5 can also be used.
+#' @param adm_lvl character; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. adm0 being the country boundary. 0, 1, 2, 3, 4 or 5 can also be used.
 #' @param type character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, SSCU or CGAZ.
 #'  Determines the type of boundary link you receive. More on details
 #' @param version character; defaults to the most recent version of geoBoundaries available.
