@@ -1,5 +1,5 @@
 #' @noRd
-baseurl <- function() "https://www.geoboundaries.org/api/current/gbOpen/"
+baseurl <- function() "https://www.geoboundaries.org/gbRequest.html"
 
 #' @noRd
 drop_nulls <- function(x)
@@ -67,8 +67,10 @@ assert_type <- function(type = NULL) {
 
 #' @noRd
 create_query <- function(x) {
-  res <- paste0(x, collapse = "/")
-  paste0("/", res)
+  f <- function(y)
+    paste0(y, "={", y, "}")
+  res <- paste0(f(x), collapse = "&")
+  paste0("?", res)
 }
 
 
@@ -76,13 +78,13 @@ create_query <- function(x) {
 #' @importFrom glue glue_data
 build_urls <- function(iso3, adm_lvl,
                        type = NULL, version = NULL) {
-  l <- list(iso3,
-            adm_lvl,
-            type,
-            version)
+  l <- list(ISO = iso3,
+            ADM = adm_lvl,
+            TYP = type,
+            VER = version)
   l <- lapply(drop_nulls(l), toupper)
   template_url <- paste0(baseurl(),
-                         create_query(l))
+                         create_query(names(l)))
 
   glue_data(l, template_url)
 }
