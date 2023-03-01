@@ -1,6 +1,6 @@
 #' @importFrom sf st_read
 #' @noRd
-#' library(dplyr)
+#' @importFrom dplyr 
 .read_gb <- function(path, quiet = TRUE, canNames, canonical, country) {
   if (length(path) >= 2) {
       l <- lapply(seq_along(path), function(i)
