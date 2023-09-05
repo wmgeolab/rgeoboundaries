@@ -5,14 +5,6 @@
 
 <!-- badges: start -->
 
-[![GitLab CI Build
-Status](https://gitlab.com/dickoa/rgeoboundaries/badges/master/pipeline.svg)](https://gitlab.com/dickoa/rgeoboundaries/pipelines)
-[![AppVeyor build
-status](https://ci.appveyor.com/api/projects/status/gitlab/dickoa/rgeoboundaries?branch=master&svg=true)](https://ci.appveyor.com/project/dickoa/rgeoboundaries)
-[![Codecov Code
-Coverage](https://codecov.io/gl/dickoa/rgeoboundaries/branch/master/graph/badge.svg)](https://codecov.io/gl/dickoa/rgeoboundaries)
-[![CRAN
-status](https://www.r-pkg.org/badges/version/rgeoboundaries)](https://cran.r-project.org/package=rgeoboundaries)
 [![License:
 MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -29,7 +21,6 @@ You can install the development version of rgeoboundaries using the
 
 ``` r
 # install.packages("remotes")
-remotes::install_gitlab("dickoa/rgeoboundaries")
 remotes::install_github("wmgeolab/rgeoboundaries")
 ```
 
