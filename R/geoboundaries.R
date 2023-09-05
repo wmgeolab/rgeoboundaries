@@ -1,15 +1,27 @@
 #' @importFrom sf st_read
 #' @noRd
-.read_gb <- function(path, quiet = TRUE, options) {
+#' @importFrom dplyr 
+.read_gb <- function(path, quiet = TRUE, canNames, canonical, country) {
   if (length(path) >= 2) {
       l <- lapply(seq_along(path), function(i)
-        st_read(path[i], quiet = quiet, options = options))
+        st_read(path[i], quiet = quiet))
       res <- do.call(rbind, l)
   } else {
-      res <- st_read(path, quiet = quiet, options = options)
+      res <- st_read(path, quiet = quiet)
   }
+  if(!is.null(canonical)){
+    iso3 <- country_to_iso3(country)
+    for (i in 1:length(iso3)){
+      if(canonical){
+        #res$boundaryCanonical <- canNames
+        res<- res %>% mutate(boundaryCanonical = if_else(tolower(shapeGroup) == tolower(iso3[i]),canNames[i],res$boundaryCanonical))}}}
   res
 }
+
+# res %>%
+#   mutate(boundaryCanonical = if_else(shapeId == country[i],canNames[i],'')
+#   ))
+
 
 #' @noRd
 #' @importFrom memoise memoise
@@ -61,7 +73,7 @@ read_gb <- memoise(.read_gb)
 #' * `gb_adm0` returns the country boundaries
 #' * `gb_adm1` if available, returns the country first administrative level boundaries
 #' * `gb_adm2` if available, returns the country second administrative level boundaries
-#' * `gb_adm3` if available, returns the country third administrative level boundaries
+#' * `gb_adm3` if avaiable, returns the country third administrative level boundaries
 #' * `gb_adm4` if available, returns the country fourth administrative level boundaries
 #' * `gb_adm5` if available, returns the country first administrative level boundaries
 #'
@@ -74,23 +86,28 @@ read_gb <- memoise(.read_gb)
 #'
 #' @export
 geoboundaries <- function(country = NULL, adm_lvl = "adm0",
-                          type = NULL, version = NULL, quiet = TRUE) {
+                          type = NULL, version = NULL, quiet = TRUE, canonical= NULL) {
   if (is.null(country) || (!is.null(type) && tolower(type) == "cgaz")) {
+    
     path <- get_cgaz_shp_link(adm_lvl, quiet = quiet)
-    res <- read_gb(path, quiet = quiet, options = NULL)
+    res <- read_gb(path, quiet = quiet)
   } else {
     links <- get_zip_links(country = country,
                            adm_lvl = adm_lvl,
                            type = type,
                            version = version)
-    shps <- get_shp_from_links(links)
+    canNames<- links[["canonicalnames"]]
+    links <- as.character(links[["Links"]])
+    shps <- get_shp_from_links(links, tolower(type))
     shps <- vapply(shps, file_path_as_absolute, character(1))
-    path <- file.path("/vsizip", shps)
+    #path <- file.path("/vsizip", shps)
     #andys temporary patch to fix encoding differences in geoboundaries
     encoding  <-  "WINDOWS-1252"
-    if (!is.null(type) && tolower(type) != "hpscu")
+    if (!is.null(type) && tolower(type) != "hpscu" && tolower(type) != "unsimplified")
       encoding <- "UTF-8"
-    res <- read_gb(path, quiet = quiet, options = paste0("ENCODING=",encoding) )
+    res <- read_gb(shps, quiet = quiet, canNames, canonical, country)
+    print("WARNING: geoBoundaries now provides two only types of boundaries: simplified and unsimplified.All other types are deprecated. If you selected SSCGS or SSCU it will be changed to simlified, HPSCU will be changed to usimplifed ")
+           
   }
   res
 }
@@ -98,54 +115,62 @@ geoboundaries <- function(country = NULL, adm_lvl = "adm0",
 
 #' @rdname geoboundaries
 #' @export
-gb_adm0 <- function(country = NULL, type = NULL, version = NULL,  quiet = TRUE)
+gb_adm0 <- function(country = NULL, type = NULL, version = NULL,  quiet = TRUE, canonical = NULL) {
+  #print("coming to first cwerwertweetSall gb_adm0")
   geoboundaries(country = country,
                 adm_lvl = "adm0",
                 type = type,
                 version = version,
-                quiet = quiet)
+                quiet = quiet,
+                canonical= canonical)
+}
 
 #' @rdname geoboundaries
 #' @export
-gb_adm1 <- function(country = NULL, type = NULL, version = NULL, quiet = TRUE)
+gb_adm1 <- function(country = NULL, type = NULL, version = NULL, quiet = TRUE, canonical = NULL)
   geoboundaries(country = country,
                 adm_lvl = "adm1",
                 type = type,
                 version = version,
-                quiet = quiet)
+                quiet = quiet,
+                canonical= canonical)
 
 #' @rdname geoboundaries
 #' @export
-gb_adm2 <- function(country = NULL, type = NULL, version = NULL, quiet = TRUE)
+gb_adm2 <- function(country = NULL, type = NULL, version = NULL, quiet = TRUE, canonical = NULL)
   geoboundaries(country = country,
                 adm_lvl = "adm2",
                 type = type,
                 version = version,
-                quiet = quiet)
+                quiet = quiet,
+                canonical= canonical)
 
 #' @rdname geoboundaries
 #' @export
-gb_adm3 <- function(country, type = NULL, version = NULL, quiet = TRUE)
+gb_adm3 <- function(country, type = NULL, version = NULL, quiet = TRUE, canonical = NULL)
   geoboundaries(country = country,
                 adm_lvl = "adm3",
                 type = type,
                 version = version,
-                quiet = quiet)
+                quiet = quiet,
+                canonical= canonical)
 
 #' @rdname geoboundaries
 #' @export
-gb_adm4 <- function(country, type = NULL, version = NULL, quiet = TRUE)
+gb_adm4 <- function(country, type = NULL, version = NULL, quiet = TRUE, canonical = NULL)
   geoboundaries(country = country,
                 adm_lvl = "adm4",
                 type = type,
                 version = version,
-                quiet = quiet)
+                quiet = quiet,
+                canonical= canonical)
 
 #' @rdname geoboundaries
 #' @export
-gb_adm5 <- function(country, type = NULL, version = NULL, quiet = TRUE)
+gb_adm5 <- function(country, type = NULL, version = NULL, quiet = TRUE, canonical = NULL)
   geoboundaries(country = country,
                 adm_lvl = "adm5",
                 type = type,
                 version = version,
-                quiet = quiet)
+                quiet = quiet,
+                canonical= canonical)

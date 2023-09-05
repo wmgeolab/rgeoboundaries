@@ -1,5 +1,5 @@
 #' @noRd
-baseurl <- function() "https://www.geoboundaries.org/gbRequest.html"
+baseurl <- function() "https://www.geoboundaries.org/api/current/gbOpen"
 
 #' @noRd
 drop_nulls <- function(x)
@@ -8,17 +8,16 @@ drop_nulls <- function(x)
 #' @noRd
 #' @importFrom countrycode countryname countrycode
 country_to_iso3 <- function(country) {
-  if (!is.null(country)) {
+  if (!is.null(country)) { 
     ind <- nchar(country) >= 4
     if (any(ind)) {
       iso3 <- countryname(country[ind],
                           destination = "iso3c")
       iso3 <- c(country[!ind], iso3)
 
-    } else {
-      iso3  <- suppressWarnings(countrycode(country,
-                                            origin = "iso3c",
-                                            destination = "iso3c"))
+    }  
+    else{
+      iso3 <- country
     }
     if (any(is.na(iso3))) {
       cntry <- paste(country[is.na(iso3)], collapse = ", ")
@@ -57,7 +56,7 @@ assert_type <- function(type = NULL) {
   if (!is.null(type)) {
     if (length(type) >= 2)
       stop("You can't mix different types!")
-    dict <- c("HPSCU", "HPSCU", "HPSCGS", "SSCGS", "SSCU", "CGAZ")
+    dict <- c("HPSCU", "HPSCU", "HPSCGS", "SSCGS", "SSCU", "CGAZ", "SIMPLIFIED", "UNSIMPLIFIED")
     cond <- toupper(type) %in% dict
     if (!cond)
       stop("Not a valid type! Use 'HPSCU', 'HPSCGS' 'SSCGS', 'SSCU' or CGAZ",
@@ -68,24 +67,49 @@ assert_type <- function(type = NULL) {
 #' @noRd
 create_query <- function(x) {
   f <- function(y)
-    paste0(y, "={", y, "}")
-  res <- paste0(f(x), collapse = "&")
-  paste0("?", res)
+    paste0("{",y,"}")
+  res <- paste0(f(x), collapse = "/")
+  paste0("/", res)
 }
+# create_query <- function(x) {
+#   f <- function(y)
+#     paste0(y, "={", y, "}")
+#   res <- paste0(f(x), collapse = "&")
+#   print(res)
+#   paste0("?", res)
+# }
 
 
 #' @noRd
 #' @importFrom glue glue_data
+#' build_urls <- function(iso3, adm_lvl,
+#'                        type = NULL, version = NULL) {
+#'   l <- list(ISO = iso3,
+#'             ADM = adm_lvl,
+#'             TYP = type,
+#'             VER = version)
+#'   l <- lapply(drop_nulls(l), toupper)
+#'   print(l)
+#'   #tempURL <- paste0(c(baseurl(), "USA", "ADM0"), collapse = "/")
+#'   #print(tempURL) 
+#'   template_url <- paste0(baseurl(),
+#'                          create_query(names(l)))
+#'   #glue_data(l, tempURL)
+#'   #print(tempURL)
+#'   glue_data(l, template_url)
+#'   print(template_url)
+#' }
+
 build_urls <- function(iso3, adm_lvl,
                        type = NULL, version = NULL) {
   l <- list(ISO = iso3,
             ADM = adm_lvl,
-            TYP = type,
+            #TYP = type,
             VER = version)
   l <- lapply(drop_nulls(l), toupper)
   template_url <- paste0(baseurl(),
                          create_query(names(l)))
-
+  
   glue_data(l, template_url)
 }
 
@@ -94,7 +118,6 @@ build_urls <- function(iso3, adm_lvl,
 #' @importFrom jsonlite fromJSON
 #' @noRd
 .gb_meta <- function(country = NULL, adm_lvl, type = NULL, version = NULL) {
-
   iso3 <- country_to_iso3(country)
   assert_type(type)
   assert_version(version)
@@ -109,7 +132,10 @@ build_urls <- function(iso3, adm_lvl,
     l <- lapply(seq_along(l), function(i) {
       r <- l[[i]]
       r <- r$parse(encoding = "UTF-8")
-      r <- fromJSON(r)
+      value <- grepl("404 not found", tolower(r), fixed = TRUE)
+      if (value)
+        stop("One of the coutry names or iso3 codes is invalid")
+      r <- fromJSON(r) %>% as.data.frame
       if (length(r) == 0)
         warning(paste(toupper(adm_lvl),
                       "not available for", country[i]), call. = TRUE)
@@ -117,12 +143,12 @@ build_urls <- function(iso3, adm_lvl,
     })
     do.call(rbind, l)
   } else {
-    cli <- HttpClient$new(baseurl())
-    res <-  cli$get(query = list(ISO = toupper(iso3),
-                                 ADM = toupper(adm_lvl),
-                                 TYP = toupper(type),
-                                 VER = toupper(version)))
+    cli <- HttpClient$new(build_urls(iso3, adm_lvl, type, version))
+    res <-cli$get()
     res <- res$parse(encoding = "UTF-8")
+    value <- grepl("404 not found", tolower(res), fixed = TRUE)
+    if (value)
+      stop("The given coutry name or iso3 code is invalid")
     res <- fromJSON(res)
     if (length(res) == 0)
       stop(paste(toupper(adm_lvl), "not available for", country))
@@ -216,13 +242,25 @@ gb_max_adm_lvl <- function(country = NULL, type = NULL,
 #'  The geoboundaries version requested, with underscores.
 #' For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.
 #' @noRd
+#' @importFrom jsonlite toJSON
 get_zip_links <- function(country = NULL, adm_lvl, type = NULL, version = NULL) {
   assert_adm_lvl(adm_lvl, c(paste0("adm", 0:5), 0:5))
   l <- gb_meta(country = country,
                adm_lvl = adm_lvl,
                type = type,
-               version = version)[["downloadURL"]]
-  as.character(l)
+               version = version) 
+  myList <- l[["staticDownloadLink"]]
+  canList <- l[["boundaryCanonical"]]
+  # for(i in l){
+  #   if (grepl(".zip", i, fixed = TRUE))
+  #    myList <- append(myList, i)
+  #   if (grepl("boundaryCanonical", i, fixed = TRUE)){
+  #     canList <- append(canList, i)
+  #     print("canonical here")
+  #     print(canList)}
+  # }
+  List <- list("Links" = myList, "canonicalnames" = canList)
+  List
 }
 
 #' @noRd
@@ -260,22 +298,33 @@ get_cgaz_shp_link <- function(adm_lvl = "adm0", quiet = TRUE) {
 
 #' @importFrom utils unzip
 #' @noRd
-extract_shp <- function(zipf, dir) {
-
-  x <- unzip(zipf, list = TRUE)
-  shp <- grep("\\-shp\\.zip$", x$Name, value = TRUE)
-  zipfcopy <- file.path(dir, basename(zipf))
-  res <- file.path(dir, shp)
-  if (!file.exists(res)) {
-    suppressWarnings(file.copy(zipf, zipfcopy))
-    unzip(zipfcopy, files = shp, exdir = dir)
+extract_shp <- function(zipf, dir, type) {
+  
+  #x <- unzip(zipf, list = TRUE)
+  name= basename(zipf)
+  # replace ".zip" with "geojson" using gsub()
+  rname=gsub("-all.zip", "", name) 
+  if(identical(type, character(0))){
+    result<- paste0(rname, ".topojson")
   }
-  res
+  else if(type=="hpscu" || type=="unsimplified")
+    result<- paste0(rname, ".geojson")
+  else
+    result<- paste0(rname,"_simplified.geojson")
+  zipfcopy <- file.path(dir, basename(zipf))
+  resultdir<- file.path(dir, result)
+  # print(zipfcopy)
+  # print(res)
+  if (!file.exists(zipfcopy)) {
+    suppressWarnings(file.copy(zipf, zipfcopy))
+    unzip(zipfcopy, exdir = dir)
+  }
+  resultdir
 }
 
 #' @noRd
 #' @importFrom crul HttpClient Async
-get_shp_from_links <- function(links) {
+get_shp_from_links <- function(links, type) {
   tmpd <- tempdir()
   zipf <- basename(links)
   tmpf <- file.path(tmpd, zipf)
@@ -288,7 +337,7 @@ get_shp_from_links <- function(links) {
   if (ll <= 0) {
     res <- vapply(zipfcopy,
                   function(x)
-                    extract_shp(x, cache_dir),
+                    extract_shp(x, cache_dir, type),
                   character(1), USE.NAMES = FALSE)
   } else {
     if (ll < 2) {
@@ -298,7 +347,7 @@ get_shp_from_links <- function(links) {
     }
     res <- cli$get(disk = tmpf_to_download)
     res <- vapply(tmpf, function(x) {
-      extract_shp(x, cache_dir)
+      extract_shp(x, cache_dir, type)
     }, character(1), USE.NAMES = FALSE)
   }
   res
