@@ -305,7 +305,7 @@ extract_shp <- function(zipf, dir, type) {
   # replace ".zip" with "geojson" using gsub()
   rname=gsub("-all.zip", "", name) 
   if(identical(type, character(0))){
-    result<- paste0(rname, ".topojson")
+    result<- paste0(rname, ".geojson")
   }
   else if(type=="hpscu" || type=="unsimplified")
     result<- paste0(rname, ".geojson")
