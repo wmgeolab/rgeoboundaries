@@ -54,22 +54,13 @@ Access country boundaries at a specified administrative level
 \details{
 Different types to of boundaries available:
 \itemize{
-\item HPSCU - High Precision Single Country Unstadardized. The premier geoBoundaries release,
+\item Unsimplified - High Precision Single Country Unstadardized. The premier geoBoundaries release,
 representing the highest precision files available for every country in the world.
 No standardization is performed on these files, so (for example) two countries
 may overlap in the case of contested boundaries.
-\item HPSCGS - High Precision Single Country Globally Standardized. A version of geoBoundaries
-high precision data that has been clipped to the U.S. Department of State boundary file,
-ensuring no contested boundaries or overlap in the dataset. This globally standardized
-product may have gaps between countries. If you need a product with no gaps,
-we recommend our simplified global product.
-\item SSCU - Simplified Single Country Unstandardized. A simplified version of every file
+\item Simplified - Simplified Single Country Unstandardized. A simplified version of every file
 available for every country in the world. No standardization is performed on these files,
 so (for example) two countries may overlap in the case of contested boundaries.
-\item SSCGS - Simplified Single Country Globally Standardized. A version of geoBoundaries
-simplified data that has been clipped to the U.S. Department of State boundary file,
-ensuring no contested boundaries or overlap in the dataset.
-This globally standardized product may have gaps between countries.
 }
 
 The following wrappers are also available:
