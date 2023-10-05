@@ -36,12 +36,8 @@ for adm0, adm1, adm2 where the administrative level are available}
 
 \item{adm_lvl}{characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. adm0 being the country boundary. 0, 1, 2, 3, 4 or 5 can also be used.}
 
-\item{type}{character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, SSCU or CGAZ.
+\item{type}{character; defaults to simplified. One of 'unsimplified' or 'simplified'.
 Determines the type of boundary link you receive. More on details}
-
-\item{version}{character; defaults to the most recent version of geoBoundaries available.
-The geoboundaries version requested, with underscores. For example, 3_0_0 would return data
-from version 3.0.0 of geoBoundaries.}
 
 \item{quiet}{logical; if TRUE no message while downloading and reading the data. Default to FALSE}
 }
