@@ -4,17 +4,13 @@
 \alias{gb_max_adm_lvl}
 \title{Get the highest administrative level available for a given country}
 \usage{
-gb_max_adm_lvl(country = NULL, type = NULL, version = NULL, license = NULL)
+gb_max_adm_lvl(country = NULL, type = NULL)
 }
 \arguments{
 \item{country}{characher; a vector of country names or iso3 country code.}
 
-\item{type}{character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, or SSCU.
+\item{type}{character; defaults to simplified. One of 'simplified' or 'unsimplified'.
 Determines the type of boundary link you receive. More on details}
-
-\item{version}{character; defaults to the most recent version of geoBoundaries available.}
-
-\item{license}{character; the license of the maximum administrative level}
 }
 \value{
 a data.frame with the country names and corresponding highest administrative level
