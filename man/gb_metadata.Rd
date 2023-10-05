@@ -4,19 +4,15 @@
 \alias{gb_metadata}
 \title{Get metadata for a country, administrative level, type of data and version}
 \usage{
-gb_metadata(country = NULL, adm_lvl = "all", type = NULL, version = NULL)
+gb_metadata(country = NULL, adm_lvl = "all", type = NULL)
 }
 \arguments{
 \item{country}{characher; a vector of country names or iso3 country code.}
 
 \item{adm_lvl}{characher; administrative level, adm0, adm1, adm2, adm3, adm4, adm5 or all. adm0 being the country and all to access all available levels.}
 
-\item{type}{character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, or SSCU.
+\item{type}{character; defaults to simplified. One of 'simplified' or 'unsimplified'.
 Determines the type of boundary link you receive. More on details}
-
-\item{version}{character; defaults to the most recent version of geoBoundaries available.
-The geoboundaries version requested, with underscores.
-For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.}
 }
 \description{
 Get metadata for a country and an administrative level, type of data and version
