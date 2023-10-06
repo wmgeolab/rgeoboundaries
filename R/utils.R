@@ -71,34 +71,12 @@ create_query <- function(x) {
   res <- paste0(f(x), collapse = "/")
   paste0("/", res)
 }
-# create_query <- function(x) {
-#   f <- function(y)
-#     paste0(y, "={", y, "}")
-#   res <- paste0(f(x), collapse = "&")
-#   print(res)
-#   paste0("?", res)
-# }
+ 
 
 
 #' @noRd
 #' @importFrom glue glue_data
-#' build_urls <- function(iso3, adm_lvl,
-#'                        type = NULL, version = NULL) {
-#'   l <- list(ISO = iso3,
-#'             ADM = adm_lvl,
-#'             TYP = type,
-#'             VER = version)
-#'   l <- lapply(drop_nulls(l), toupper)
-#'   print(l)
-#'   #tempURL <- paste0(c(baseurl(), "USA", "ADM0"), collapse = "/")
-#'   #print(tempURL) 
-#'   template_url <- paste0(baseurl(),
-#'                          create_query(names(l)))
-#'   #glue_data(l, tempURL)
-#'   #print(tempURL)
-#'   glue_data(l, template_url)
-#'   print(template_url)
-#' }
+
 
 build_urls <- function(iso3, adm_lvl,
                        type = NULL, version = NULL) {
@@ -251,14 +229,7 @@ get_zip_links <- function(country = NULL, adm_lvl, type = NULL, version = NULL) 
                version = version) 
   myList <- l[["staticDownloadLink"]]
   canList <- l[["boundaryCanonical"]]
-  # for(i in l){
-  #   if (grepl(".zip", i, fixed = TRUE))
-  #    myList <- append(myList, i)
-  #   if (grepl("boundaryCanonical", i, fixed = TRUE)){
-  #     canList <- append(canList, i)
-  #     print("canonical here")
-  #     print(canList)}
-  # }
+
   List <- list("Links" = myList, "canonicalnames" = canList)
   List
 }
@@ -300,9 +271,9 @@ get_cgaz_shp_link <- function(adm_lvl = "adm0", quiet = TRUE) {
 #' @noRd
 extract_shp <- function(zipf, dir, type) {
   
-  #x <- unzip(zipf, list = TRUE)
+  
   name= basename(zipf)
-  # replace ".zip" with "geojson" using gsub()
+
   rname=gsub("-all.zip", "", name) 
   if(identical(type, character(0))){
     result<- paste0(rname, ".geojson")

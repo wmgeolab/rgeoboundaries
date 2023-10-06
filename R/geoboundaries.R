@@ -1,7 +1,7 @@
 #' @importFrom sf st_read
 #' @noRd
-#' @importFrom dplyr 
-.read_gb <- function(path, quiet = TRUE, canNames, canonical, country) {
+
+.read_gb <- function(path, quiet = TRUE, canNames, country) {
   if (length(path) >= 2) {
       l <- lapply(seq_along(path), function(i)
         st_read(path[i], quiet = quiet))
@@ -9,19 +9,14 @@
   } else {
       res <- st_read(path, quiet = quiet)
   }
-  if(!is.null(canonical)){
+  if (!is.null(canNames)) {
     iso3 <- country_to_iso3(country)
-    for (i in 1:length(iso3)){
-      if(canonical){
-        #res$boundaryCanonical <- canNames
-        res<- res %>% mutate(boundaryCanonical = if_else(tolower(shapeGroup) == tolower(iso3[i]),canNames[i],res$boundaryCanonical))}}}
+    condition <- tolower(res$shapeGroup) %in% tolower(iso3)
+    res$boundaryCanonical[condition] <- canNames[match(tolower(res$shapeGroup[condition]), tolower(iso3))]
+  }
+  
   res
 }
-
-# res %>%
-#   mutate(boundaryCanonical = if_else(shapeId == country[i],canNames[i],'')
-#   ))
-
 
 #' @noRd
 #' @importFrom memoise memoise
@@ -92,7 +87,9 @@ geoboundaries <- function(country = NULL, adm_lvl = "adm0",
     if (!is.null(type) && tolower(type) != "hpscu" && tolower(type) != "unsimplified")
       encoding <- "UTF-8"
     res <- read_gb(shps, quiet = quiet, canNames, canonical, country)
-    print("WARNING: geoBoundaries provides two only types of boundaries: simplified and unsimplified. For backwards compatability purposes, if you selected SSCGS or SSCU it will be changed to simplified, and HPSCU will be changed to unsimplifed.")
+
+    if(type=="hpscu" || type=="sscgs" || type=="sscu")
+      print("WARNING: geoBoundaries provides two only types of boundaries: simplified and unsimplified. For backwards compatability purposes, if you selected SSCGS or SSCU it will be changed to simplified, and HPSCU will be changed to unsimplifed.")
            
   }
   res
@@ -101,62 +98,55 @@ geoboundaries <- function(country = NULL, adm_lvl = "adm0",
 
 #' @rdname geoboundaries
 #' @export
-gb_adm0 <- function(country = NULL, type = NULL, version = NULL,  quiet = TRUE, canonical = NULL) {
-  #print("coming to first cwerwertweetSall gb_adm0")
+gb_adm0 <- function(country = NULL, type = NULL, version = NULL,  quiet = TRUE) {
   geoboundaries(country = country,
                 adm_lvl = "adm0",
                 type = type,
                 version = version,
-                quiet = quiet,
-                canonical= canonical)
+                quiet = quiet)
 }
 
 #' @rdname geoboundaries
 #' @export
-gb_adm1 <- function(country = NULL, type = NULL, version = NULL, quiet = TRUE, canonical = NULL)
+gb_adm1 <- function(country = NULL, type = NULL, version = NULL, quiet = TRUE)
   geoboundaries(country = country,
                 adm_lvl = "adm1",
                 type = type,
                 version = version,
-                quiet = quiet,
-                canonical= canonical)
+                quiet = quiet)
 
 #' @rdname geoboundaries
 #' @export
-gb_adm2 <- function(country = NULL, type = NULL, version = NULL, quiet = TRUE, canonical = NULL)
+gb_adm2 <- function(country = NULL, type = NULL, version = NULL, quiet = TRUE)
   geoboundaries(country = country,
                 adm_lvl = "adm2",
                 type = type,
                 version = version,
-                quiet = quiet,
-                canonical= canonical)
+                quiet = quiet)
 
 #' @rdname geoboundaries
 #' @export
-gb_adm3 <- function(country, type = NULL, version = NULL, quiet = TRUE, canonical = NULL)
+gb_adm3 <- function(country, type = NULL, version = NULL, quiet = TRUE)
   geoboundaries(country = country,
                 adm_lvl = "adm3",
                 type = type,
                 version = version,
-                quiet = quiet,
-                canonical= canonical)
+                quiet = quiet)
 
 #' @rdname geoboundaries
 #' @export
-gb_adm4 <- function(country, type = NULL, version = NULL, quiet = TRUE, canonical = NULL)
+gb_adm4 <- function(country, type = NULL, version = NULL, quiet = TRUE)
   geoboundaries(country = country,
                 adm_lvl = "adm4",
                 type = type,
                 version = version,
-                quiet = quiet,
-                canonical= canonical)
+                quiet = quiet)
 
 #' @rdname geoboundaries
 #' @export
-gb_adm5 <- function(country, type = NULL, version = NULL, quiet = TRUE, canonical = NULL)
+gb_adm5 <- function(country, type = NULL, version = NULL, quiet = TRUE)
   geoboundaries(country = country,
                 adm_lvl = "adm5",
                 type = type,
                 version = version,
-                quiet = quiet,
-                canonical= canonical)
+                quiet = quiet)

@@ -1,19 +1,25 @@
 Package: rgeoboundaries
-Title: A Client to geoBoundaries, A Political Administrative Boundaries Dataset
-Version: 0.0.0.9000
-Authors@R: c(person(given = "Ahmadou", family = "Dicko",
-	          role = c("aut", "cre"),
+Title: A Client to geoBoundaries, a Political Administrative Boundaries Dataset
+Version: 1.1.0
+Authors@R: c(person(given = "Daniel", family = "Runfola",
+	          role = "aut",
+                  email = "team@geoboundaries.org"),
+             person(given = "Ahmadou", family = "Dicko",
+	          role = "ctb",
                   email = "mail@ahmadoudicko.com"),
              person(given = "Andy", family = "South",
 		  email = "southandy@gmail.com",
-		  role = "ctb"))
+		  role = "ctb"),
+	     person(given = "Rohith Reddy", family = "Mandala",
+		  email = "rohithreddy.m4@gmail.com",
+		  role = "cre"))
 Description: Client the access data from the geoBoundaries API who provides country
   political administrative boundaries dataset.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-URL: https://gitlab.com/dickoa/rgeoboundaries
-BugReports: https://gitlab.com/dickoa/rgeoboundaries/issues
+URL: https://github.com/wmgeolab/rgeoboundaries
+BugReports: https://github.com/wmgeolab/rgeoboundaries/issues
 Depends:
     R (>= 3.5)
 Imports:
@@ -24,6 +30,7 @@ Imports:
     glue,
     memoise,
     countrycode (>= 1.2.0),
+    dplyr
 Suggests:
     roxygen2,
     knitr,
