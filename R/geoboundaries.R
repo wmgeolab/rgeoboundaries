@@ -38,35 +38,21 @@ read_gb <- memoise(.read_gb)
 #' @param country characher; a vector of country names or country ISO3. If NULL all countries will be used
 #'  for adm0, adm1, adm2 where the administrative level are available
 #' @param adm_lvl character; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. adm0 being the country boundary. 0, 1, 2, 3, 4 or 5 can also be used.
-#' @param type character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, SSCU or CGAZ.
+#' @param type character; defaults to Simplified. One of Simplified or Unsimplified.
 #'  Determines the type of boundary link you receive. More on details
-#' @param version character; defaults to the most recent version of geoBoundaries available.
-#'  The geoboundaries version requested, with underscores. For example, 3_0_0 would return data
-#'  from version 3.0.0 of geoBoundaries.
 #' @param quiet logical; if TRUE no message while downloading and reading the data. Default to FALSE
 #'
 #' @details
 #' Different types to of boundaries available:
 #'
-#' * HPSCU - High Precision Single Country Unstadardized. The premier geoBoundaries release,
+#' * Unsimplified - High Precision Single Country Unstadardized. The premier geoBoundaries release,
 #'   representing the highest precision files available for every country in the world.
 #'   No standardization is performed on these files, so (for example) two countries
 #'   may overlap in the case of contested boundaries.
 #'
-#' * HPSCGS - High Precision Single Country Globally Standardized. A version of geoBoundaries
-#'   high precision data that has been clipped to the U.S. Department of State boundary file,
-#'   ensuring no contested boundaries or overlap in the dataset. This globally standardized
-#'   product may have gaps between countries. If you need a product with no gaps,
-#'   we recommend our simplified global product.
-#'
-#' * SSCU - Simplified Single Country Unstandardized. A simplified version of every file
+#' * Simplified - Simplified Single Country Unstandardized. A simplified version of every file
 #'   available for every country in the world. No standardization is performed on these files,
 #'   so (for example) two countries may overlap in the case of contested boundaries.
-#'
-#' * SSCGS - Simplified Single Country Globally Standardized. A version of geoBoundaries
-#'   simplified data that has been clipped to the U.S. Department of State boundary file,
-#'   ensuring no contested boundaries or overlap in the dataset.
-#'   This globally standardized product may have gaps between countries.
 #'
 #' The following wrappers are also available:
 #'
@@ -106,7 +92,7 @@ geoboundaries <- function(country = NULL, adm_lvl = "adm0",
     if (!is.null(type) && tolower(type) != "hpscu" && tolower(type) != "unsimplified")
       encoding <- "UTF-8"
     res <- read_gb(shps, quiet = quiet, canNames, canonical, country)
-    print("WARNING: geoBoundaries now provides two only types of boundaries: simplified and unsimplified.All other types are deprecated. If you selected SSCGS or SSCU it will be changed to simlified, HPSCU will be changed to usimplifed ")
+    print("WARNING: geoBoundaries provides two only types of boundaries: simplified and unsimplified. For backwards compatability purposes, if you selected SSCGS or SSCU it will be changed to simplified, and HPSCU will be changed to unsimplifed.")
            
   }
   res
