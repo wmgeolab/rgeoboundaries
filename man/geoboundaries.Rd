@@ -40,6 +40,10 @@ for adm0, adm1, adm2 where the administrative level are available}
 Determines the type of boundary link you receive. More on details}
 
 \item{quiet}{logical; if TRUE no message while downloading and reading the data. Default to FALSE}
+
+\item{version}{character; defaults to the most recent version of geoBoundaries available.
+The geoboundaries version requested, with underscores. For example, 3_0_0 would return data
+from version 3.0.0 of geoBoundaries.}
 }
 \value{
 a \code{sf} object

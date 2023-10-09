@@ -1,7 +1,7 @@
 #' @importFrom sf st_read
 #' @noRd
 
-.read_gb <- function(path, quiet = TRUE, canNames, country) {
+.read_gb <- function(path, quiet = TRUE, canNames = NULL, country) {
   if (length(path) >= 2) {
       l <- lapply(seq_along(path), function(i)
         st_read(path[i], quiet = quiet))
@@ -67,7 +67,7 @@ read_gb <- memoise(.read_gb)
 #'
 #' @export
 geoboundaries <- function(country = NULL, adm_lvl = "adm0",
-                          type = NULL, version = NULL, quiet = TRUE, canonical= NULL) {
+                          type = NULL, version = NULL, quiet = TRUE) {
   if (is.null(country) || (!is.null(type) && tolower(type) == "cgaz")) {
     
     path <- get_cgaz_shp_link(adm_lvl, quiet = quiet)
@@ -86,11 +86,11 @@ geoboundaries <- function(country = NULL, adm_lvl = "adm0",
     encoding  <-  "WINDOWS-1252"
     if (!is.null(type) && tolower(type) != "hpscu" && tolower(type) != "unsimplified")
       encoding <- "UTF-8"
-    res <- read_gb(shps, quiet = quiet, canNames, canonical, country)
+    res <- read_gb(shps, quiet = quiet, canNames, country)
 
-    if(type=="hpscu" || type=="sscgs" || type=="sscu")
-      print("WARNING: geoBoundaries provides two only types of boundaries: simplified and unsimplified. For backwards compatability purposes, if you selected SSCGS or SSCU it will be changed to simplified, and HPSCU will be changed to unsimplifed.")
-           
+    if(!is.null(type) && ((type)=="hpscu" || (type)=="sscgs" || (type)=="sscu")){
+      print("WARNING: geoBoundaries provides only two types of boundaries: simplified and unsimplified. For backwards compatability purposes, if you selected SSCGS or SSCU it will be changed to simplified, and HPSCU will be changed to unsimplifed.")
+    }   
   }
   res
 }

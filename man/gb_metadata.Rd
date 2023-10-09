@@ -4,7 +4,7 @@
 \alias{gb_metadata}
 \title{Get metadata for a country, administrative level, type of data and version}
 \usage{
-gb_metadata(country = NULL, adm_lvl = "all", type = NULL)
+gb_metadata(country = NULL, adm_lvl = "all", type = NULL, version = NULL)
 }
 \arguments{
 \item{country}{characher; a vector of country names or iso3 country code.}
@@ -13,7 +13,12 @@ gb_metadata(country = NULL, adm_lvl = "all", type = NULL)
 
 \item{type}{character; defaults to simplified. One of 'simplified' or 'unsimplified'.
 Determines the type of boundary link you receive. More on details}
+
+\item{version}{character; defaults to the most recent version of geoBoundaries available.
+The geoboundaries version requested, with underscores.
+For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.}
 }
+
 \description{
 Get metadata for a country and an administrative level, type of data and version
 }
