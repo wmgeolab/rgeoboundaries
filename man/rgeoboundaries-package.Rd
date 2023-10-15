@@ -9,6 +9,6 @@
 R client to access geoBoundaries API
 }
 \author{
-\email{team@geoboundaries.org}
+\email{mail@ahmadoudicko.com}
 }
 \keyword{package}

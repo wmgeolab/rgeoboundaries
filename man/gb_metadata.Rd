@@ -4,21 +4,19 @@
 \alias{gb_metadata}
 \title{Get metadata for a country, administrative level, type of data and version}
 \usage{
-gb_metadata(country = NULL, adm_lvl = "all", type = NULL, version = NULL)
+gb_metadata(
+  country = NULL,
+  adm_lvl = "all",
+  release_type = c("gbOpen", "gbHumanitarian", "gbAuthoritative")
+)
 }
 \arguments{
-\item{country}{characher; a vector of country names or iso3 country code.}
+\item{country}{characher; a vector of country names or iso 3 country codes}
 
-\item{adm_lvl}{characher; administrative level, adm0, adm1, adm2, adm3, adm4, adm5 or all. adm0 being the country and all to access all available levels.}
+\item{adm_lvl}{characher or integer; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. adm0 being the country. 0, 1, 2, 3, 4 or 5 can also be used.}
 
-\item{type}{character; defaults to simplified. One of 'simplified' or 'unsimplified'.
-Determines the type of boundary link you receive. More on details}
-
-\item{version}{character; defaults to the most recent version of geoBoundaries available.
-The geoboundaries version requested, with underscores.
-For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.}
+\item{release_type}{character; This is one of gbOpen, gbHumanitarian, or gbAuthoritative. For most users, we suggest using gbOpen, as it is CC-BY 4.0 compliant, and can be used for most purposes so long as attribution is provided. gbHumanitarian files are mirrored from UN OCHA, but may have less open licensure. gbAuthoritative files are mirrored from UN SALB, and cannot be used for commerical purposes, but are verified through in-country processes. Default to gbOpen.}
 }
-
 \description{
 Get metadata for a country and an administrative level, type of data and version
 }

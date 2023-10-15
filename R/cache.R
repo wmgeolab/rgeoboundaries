@@ -51,8 +51,11 @@ gb_set_cache <- function(path) {
 #' @export
 gb_get_cache <- function(create = FALSE) {
   dir <- gb_cache$cache_path_get()
-  if (create & !dir.exists(dir))
+  if (!dir.exists(dir)) {
+    message("You don't have a cache directory, please create it with `gb_get_cache(create = TRUE)`")
+  if (isTRUE(create))
     gb_cache$mkdir()
+  }
   dir
 }
 

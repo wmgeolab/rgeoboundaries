@@ -1,5 +1,5 @@
 #' @noRd
-baseurl <- function() "https://www.geoboundaries.org/api/current/gbOpen"
+baseurl <- function() "https://www.geoboundaries.org/api/current"
 
 #' @noRd
 drop_nulls <- function(x)
@@ -8,15 +8,17 @@ drop_nulls <- function(x)
 #' @noRd
 #' @importFrom countrycode countryname countrycode
 country_to_iso3 <- function(country) {
-  if (!is.null(country)) { 
+  if (!is.null(country)) {
+    if ("kosovo" %in% tolower(country))
+      country[tolower(country) %in% "kosovo"] <- "XKX"
     ind <- nchar(country) >= 4
     if (any(ind)) {
       iso3 <- countryname(country[ind],
                           destination = "iso3c")
       iso3 <- c(country[!ind], iso3)
 
-    }  
-    else{
+    }
+    else {
       iso3 <- country
     }
     if (any(is.na(iso3))) {
@@ -39,99 +41,100 @@ assert_adm_lvl <- function(adm_lvl, dict = paste0("adm", 0:5)) {
 }
 
 #' @noRd
-assert_version <- function(version = NULL) {
-  if (!is.null(version)) {
-    if (length(version) >= 2)
-      stop("You can't mix different versions of data!")
-    dict <- c("2_0_1", "3_0_0")
-    cond <- tolower(version) %in% dict
-    if (!cond)
-      stop("Not a valid version! Use '2_0_1' or '3_0_0'",
-           call. = FALSE)
-  }
-}
-
-#' @noRd
-assert_type <- function(type = NULL) {
-  if (!is.null(type)) {
-    if (length(type) >= 2)
-      stop("You can't mix different types!")
-    dict <- c("HPSCU", "HPSCU", "HPSCGS", "SSCGS", "SSCU", "CGAZ", "SIMPLIFIED", "UNSIMPLIFIED")
-    cond <- toupper(type) %in% dict
-    if (!cond)
-      stop("Not a valid type! Use 'HPSCU', 'HPSCGS' 'SSCGS', 'SSCU' or CGAZ",
-           call. = FALSE)
-  }
-}
-
-#' @noRd
 create_query <- function(x) {
   f <- function(y)
     paste0("{",y,"}")
   res <- paste0(f(x), collapse = "/")
   paste0("/", res)
 }
- 
-
 
 #' @noRd
 #' @importFrom glue glue_data
-
-
 build_urls <- function(iso3, adm_lvl,
-                       type = NULL, version = NULL) {
-  l <- list(ISO = iso3,
-            ADM = adm_lvl,
-            #TYP = type,
-            VER = version)
-  l <- lapply(drop_nulls(l), toupper)
+                       release_type) {
+  iso3 <- toupper(iso3)
+  adm_lvl <- toupper(adm_lvl)
+  l <- list(RELEASE_TYPE = release_type,
+            ISO = iso3,
+            ADM = adm_lvl)
+  l <- drop_nulls(l)
   template_url <- paste0(baseurl(),
                          create_query(names(l)))
-  
   glue_data(l, template_url)
+}
+
+#' @importFrom crul HttpRequest AsyncQueue
+#' @noRd
+xget_async <- function(urls) {
+  reqs <- lapply(urls, function(url) {
+    req <- HttpRequest$new(url)
+    req$retry("get",
+              times = 3,
+              retry_only_on = c(500, 503),
+              terminate_on = 404)
+  })
+  sleep <- 0.1
+  res <- AsyncQueue$new(.list = reqs,
+                        bucket_size = Inf,
+                        sleep = sleep)
+  res$request()
+  cond <- res$status_code() >= 300L
+  if (any(cond)) {
+    msg <- res$content()[cond]
+    stop("One of the coutry names or iso3 codes is invalid",
+         call. = FALSE)
+  }
+  res <- res$parse(encoding = "UTF-8")
+  res
+}
+
+#' @noRd
+xget <- function(urls) {
+  cli <- HttpClient$new(urls)
+  res <- cli$retry("get",
+                   times = 3,
+                   retry_only_on = c(500, 503),
+                   terminate_on = 404)
+  if (res$status_code >= 300)
+    stop("The country name or iso3 code is invalid!",
+         call. = FALSE)
+  res$raise_for_ct_json()
+  res$parse("UTF-8")
 }
 
 #' @rdname gb_meta
 #' @importFrom crul Async HttpClient
 #' @importFrom jsonlite fromJSON
 #' @noRd
-.gb_meta <- function(country = NULL, adm_lvl, type = NULL, version = NULL) {
+.gb_meta <- function(country = NULL, adm_lvl,
+                     release_type = c("gbOpen", "gbHumanitarian", "gbAuthoritative")) {
+  release_type <- match.arg(release_type)
   iso3 <- country_to_iso3(country)
-  assert_type(type)
-  assert_version(version)
+  adm_lvl <- toupper(adm_lvl)
 
   if (grepl("^[0-5]$", adm_lvl))
     adm_lvl <- paste0("ADM", adm_lvl)
 
-  if (length(iso3) >= 2) {
-    urls <- build_urls(iso3, adm_lvl, type, version)
-    async_cli <- Async$new(url = urls)
-    l <- async_cli$get()
-    l <- lapply(seq_along(l), function(i) {
-      r <- l[[i]]
-      r <- r$parse(encoding = "UTF-8")
-      value <- grepl("404 not found", tolower(r), fixed = TRUE)
-      if (value)
-        stop("One of the coutry names or iso3 codes is invalid")
-      r <- fromJSON(r) %>% as.data.frame
-      if (length(r) == 0)
-        warning(paste(toupper(adm_lvl),
-                      "not available for", country[i]), call. = TRUE)
-      r
-    })
-    do.call(rbind, l)
+  urls <- build_urls(iso3, "ALL", release_type)
+
+  if (length(urls) >= 2) {
+    res <- xget_async(urls)
+    res <- do.call(rbind, lapply(res,
+                          \(x) as.data.frame(fromJSON(x))))
   } else {
-    cli <- HttpClient$new(build_urls(iso3, adm_lvl, type, version))
-    res <-cli$get()
-    res <- res$parse(encoding = "UTF-8")
-    value <- grepl("404 not found", tolower(res), fixed = TRUE)
-    if (value)
-      stop("The given coutry name or iso3 code is invalid")
-    res <- fromJSON(res)
-    if (length(res) == 0)
-      stop(paste(toupper(adm_lvl), "not available for", country))
-    res
+    res <- xget(urls)
+    res <- as.data.frame(fromJSON(res))
   }
+
+  if (adm_lvl != "ALL") {
+    if (!adm_lvl %in% res$boundaryType) {
+      stop(paste0(adm_lvl, " not available!"),
+           call. = FALSE)
+    } else {
+      res <- res[res$boundaryType %in% adm_lvl, ]
+    }
+  }
+  res
 }
 
 #' Get metadata for a country, administrative level, type of data and version
@@ -139,12 +142,8 @@ build_urls <- function(iso3, adm_lvl,
 #' Get metadata for a country and an administrative level
 #'
 #' @param adm_lvl characher or integer; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. adm0 being the country. 0, 1, 2, 3, 4 or 5 can also be used.
-#' @param country characher; a vector of country names
-#' @param type character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, or SSCU.
-#'  Determines the type of boundary link you receive. More on details
-#' @param version character; defaults to the most recent version of geoBoundaries available.
-#'  The geoboundaries version requested, with underscores.
-#' For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.
+#' @param country characher; a vector of country names or iso 3 country codes
+#' @param release_type character; This is one of gbOpen, gbHumanitarian, or gbAuthoritative. For most users, we suggest using gbOpen, as it is CC-BY 4.0 compliant, and can be used for most purposes so long as attribution is provided. gbHumanitarian files are mirrored from UN OCHA, but may have less open licensure. gbAuthoritative files are mirrored from UN SALB, and cannot be used for commerical purposes, but are verified through in-country processes. Default to gbOpen.
 #' @rdname gb_meta
 #' @importFrom memoise memoise
 #' @noRd
@@ -155,24 +154,18 @@ gb_meta <- memoise(.gb_meta)
 #'
 #' Get metadata for a country and an administrative level, type of data and version
 #'
-#' @param adm_lvl characher; administrative level, adm0, adm1, adm2, adm3, adm4, adm5 or all. adm0 being the country and all to access all available levels.
-#' @param country characher; a vector of country names or iso3 country code.
-#' @param type character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, or SSCU.
-#'  Determines the type of boundary link you receive. More on details
-#' @param version character; defaults to the most recent version of geoBoundaries available.
-#'  The geoboundaries version requested, with underscores.
-#' For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.
+#' @param adm_lvl characher or integer; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. adm0 being the country. 0, 1, 2, 3, 4 or 5 can also be used.
+#' @param country characher; a vector of country names or iso 3 country codes
+#' @param release_type character; This is one of gbOpen, gbHumanitarian, or gbAuthoritative. For most users, we suggest using gbOpen, as it is CC-BY 4.0 compliant, and can be used for most purposes so long as attribution is provided. gbHumanitarian files are mirrored from UN OCHA, but may have less open licensure. gbAuthoritative files are mirrored from UN SALB, and cannot be used for commerical purposes, but are verified through in-country processes. Default to gbOpen.
 #' @rdname gb_metadata
 #' @export
-gb_metadata <- function(country = NULL, adm_lvl = "all", type = NULL, version = NULL) {
+gb_metadata <- function(country = NULL, adm_lvl = "all",
+                        release_type = c("gbOpen", "gbHumanitarian", "gbAuthoritative")) {
   assert_adm_lvl(adm_lvl, c("all", paste0("adm", 0:5), 0:5))
   gb_meta(country = country,
           adm_lvl = adm_lvl,
-          type = type,
-          version = version)
+          release_type = release_type)
 }
-
-
 
 #' Get the highest administrative level available for a given country
 #'
@@ -180,27 +173,22 @@ gb_metadata <- function(country = NULL, adm_lvl = "all", type = NULL, version = 
 #'
 #' @importFrom countrycode countrycode
 #'
-#' @param country characher; a vector of country names or iso3 country code.
-#' @param type character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, or SSCU.
-#'  Determines the type of boundary link you receive. More on details
-#' @param version character; defaults to the most recent version of geoBoundaries available.
-#' @param license character; the license of the maximum administrative level
-#'
+#' @param country characher; a vector of country names or iso3 country codes.
+#' @param release_type character; This is one of gbOpen, gbHumanitarian, or gbAuthoritative.
+#' For most users, we suggest using gbOpen, as it is CC-BY 4.0 compliant, and can be used
+#' for most purposes so long as attribution is provided. gbHumanitarian files are
+#' mirrored from UN OCHA, but may have less open licensure. gbAuthoritative files are
+#' mirrored from UN SALB, and cannot be used for commerical purposes,
+#' but are verified through in-country processes. Default to gbOpen.
 #' @return a data.frame with the country names and corresponding highest administrative level
 #' @export
-gb_max_adm_lvl <- function(country = NULL, type = NULL,
-                           version = NULL, license = NULL) {
+gb_max_adm_lvl <- function(country = NULL,
+                           release_type = c("gbOpen", "gbHumanitarian", "gbAuthoritative")) {
+  release_type <- match.arg(release_type)
   ord <- country_to_iso3(country)
   df <- gb_meta(country = country,
                 adm_lvl = "all",
-                type = type,
-                version = version)
-  available_licenses <- unique(df$boundaryLicense)
-  if (!is.null(license)) {
-    stopifnot("License not available!" = license %in% available_licenses)
-    df <- df[df$boundaryLicense == license, ]
-  }
-
+                release_type = release_type)
   res <- tapply(df$boundaryType, df$boundaryISO, max)
   res <- res[toupper(ord)]
   res <- as.integer(gsub("[^0-5]", "", res))
@@ -213,113 +201,78 @@ gb_max_adm_lvl <- function(country = NULL, type = NULL,
 #' Get download link for the zip with data for a country, administrative level, type of data and version
 #'
 #' @param country characher; a vector of country names
-#' @param adm_lvl characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. adm0 being the country.
-#' @param type character; defaults to HPSCU. One of HPSCU, HPSCGS, SSCGS, or SSCU.
-#'  Determines the type of boundary link you receive. More on details
-#' @param version character; defaults to the most recent version of geoBoundaries available.
-#'  The geoboundaries version requested, with underscores.
-#' For example, 3_0_0 would return data from version 3.0.0 of geoBoundaries.
+#' @param adm_lvl characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. adm0
+#' being the country.
+#' @param release_type character; This is one of gbOpen, gbHumanitarian, or gbAuthoritative.
+#' For most users, we suggest using gbOpen, as it is CC-BY 4.0 compliant, and can be used for most
+#' purposes so long as attribution is provided. gbHumanitarian files are mirrored from UN OCHA,
+#' but may have less open licensure. gbAuthoritative files are mirrored from UN SALB, and cannot
+#' be used for commerical purposes, but are verified through in-country processes. Default to gbOpen.
 #' @noRd
 #' @importFrom jsonlite toJSON
-get_zip_links <- function(country = NULL, adm_lvl, type = NULL, version = NULL) {
+get_adm_shp_link <- function(country = NULL,
+                          adm_lvl,
+                          type = c("unsimplified", "simplified"),
+                          release_type = c("gbOpen", "gbHumanitarian", "gbAuthoritative"),
+                          force = FALSE,
+                          quiet = TRUE) {
+  type <- match.arg(type)
+  release_type <- match.arg(release_type)
   assert_adm_lvl(adm_lvl, c(paste0("adm", 0:5), 0:5))
+
   l <- gb_meta(country = country,
                adm_lvl = adm_lvl,
-               type = type,
-               version = version) 
-  myList <- l[["staticDownloadLink"]]
-  canList <- l[["boundaryCanonical"]]
-
-  List <- list("Links" = myList, "canonicalnames" = canList)
-  List
+               release_type = release_type)
+  urls <- l[["staticDownloadLink"]]
+  cache_dir <- gb_get_cache()
+  destfiles <- file.path(cache_dir, basename(urls))
+  if (!all(file.exists(destfiles)) | isTRUE(force)) {
+    lapply(seq_along(urls), \(i)
+           download.file(urls[i],
+                         destfile = destfiles[i],
+                         quiet = quiet))
+  }
+  files <- switch(type,
+                  unsimplified = gsub("-all.zip$", ".shp",
+                                      basename(destfiles)),
+                  simplified = gsub("-all.zip$", "_simplified.shp",
+                                    basename(destfiles)))
+  data.frame(path = path.expand(file.path(destfiles, files)),
+             shapeCanonical = l[["boundaryCanonical"]],
+             shapeGroup = l[["boundaryISO"]],
+             shapeType = l[["boundaryType"]])
 }
 
 #' @noRd
 #' @importFrom utils download.file
-get_cgaz_shp_link <- function(adm_lvl = "adm0", quiet = TRUE) {
+get_cgaz_shp_link <- function(adm_lvl = "adm0", quiet = TRUE, force = FALSE) {
   assert_adm_lvl(adm_lvl, c(paste0("adm", 0:2), 0:2))
 
   if (grepl("^[0-2]$", adm_lvl))
     adm_lvl <- paste0("adm", adm_lvl)
 
   adm_lvl <- tolower(adm_lvl)
-  base_url <- "https://www.geoboundaries.org/data/geoBoundariesCGAZ-3_0_0/"
+  base_url <- "https://github.com/wmgeolab/geoBoundaries/raw/main/releaseData/CGAZ/"
   url_root <- switch(adm_lvl,
                 adm0 = paste0(base_url,
-                              "ADM0/simplifyRatio_25/shp/geoBoundariesCGAZ_ADM0"),
+                              "geoBoundariesCGAZ_ADM0.zip"),
                 adm1 = paste0(base_url,
-                              "ADM1/simplifyRatio_25/shp/geoBoundariesCGAZ_ADM1"),
+                              "geoBoundariesCGAZ_ADM1.zip"),
                 adm2 = paste0(base_url,
-                              "ADM2/simplifyRatio_25/shp/geoBoundariesCGAZ_ADM2"))
-  cache_dir <- gb_get_cache(create = TRUE)
-  folder_name <- basename(url_root)
-  cgaz_folder <- file.path(cache_dir, folder_name)
-  if (!dir.exists(cgaz_folder))
-    dir.create(cgaz_folder)
-  prefixes <- c(".shp", ".prj", ".shx", ".dbf")
-  urls <- paste0(url_root, prefixes)
-  destfiles <- file.path(cgaz_folder, basename(urls))
-  if (length(list.files(cgaz_folder)) == 0) {
-    cli <- Async$new(url = urls)
-    cli$get(disk = destfiles)
+                              "geoBoundariesCGAZ_ADM2.zip"))
+  cache_dir <- gb_get_cache()
+  urls <- url_root
+  destfiles <- file.path(cache_dir, basename(urls))
+  if (!all(file.exists(destfiles)) | isTRUE(force)) {
+    download.file(urls,
+                  destfile = destfiles,
+                  quiet = quiet)
   }
-  grep("shp$", destfiles, value = TRUE)
-}
-
-
-#' @importFrom utils unzip
-#' @noRd
-extract_shp <- function(zipf, dir, type) {
-  
-  
-  name= basename(zipf)
-
-  rname=gsub("-all.zip", "", name) 
-  if(identical(type, character(0))){
-    result<- paste0(rname, ".geojson")
-  }
-  else if(type=="hpscu" || type=="unsimplified")
-    result<- paste0(rname, ".geojson")
-  else
-    result<- paste0(rname,"_simplified.geojson")
-  zipfcopy <- file.path(dir, basename(zipf))
-  resultdir<- file.path(dir, result)
-  # print(zipfcopy)
-  # print(res)
-  if (!file.exists(zipfcopy)) {
-    suppressWarnings(file.copy(zipf, zipfcopy))
-    unzip(zipfcopy, exdir = dir)
-  }
-  resultdir
+  path.expand(destfiles)
 }
 
 #' @noRd
-#' @importFrom crul HttpClient Async
-get_shp_from_links <- function(links, type) {
-  tmpd <- tempdir()
-  zipf <- basename(links)
-  tmpf <- file.path(tmpd, zipf)
-  cache_dir <- gb_get_cache(create = TRUE)
-  zipfcopy <- file.path(cache_dir, zipf)
-  cond <- file.exists(zipfcopy)
-  links <- links[!cond]
-  tmpf_to_download <- tmpf[!cond]
-  ll <- length(links)
-  if (ll <= 0) {
-    res <- vapply(zipfcopy,
-                  function(x)
-                    extract_shp(x, cache_dir, type),
-                  character(1), USE.NAMES = FALSE)
-  } else {
-    if (ll < 2) {
-      cli <- HttpClient$new(url = links)
-    } else {
-      cli <- Async$new(url = links)
-    }
-    res <- cli$get(disk = tmpf_to_download)
-    res <- vapply(tmpf, function(x) {
-      extract_shp(x, cache_dir, type)
-    }, character(1), USE.NAMES = FALSE)
-  }
-  res
+ask_permission <- function(msg, default = TRUE) {
+  ok <- utils::askYesNo(msg, default = default)
+  isTRUE(ok)
 }

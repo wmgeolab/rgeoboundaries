@@ -1,36 +1,35 @@
 Package: rgeoboundaries
-Title: A Client to geoBoundaries, a Political Administrative Boundaries Dataset
-Version: 1.1.0
-Authors@R: c(person(given = "Daniel", family = "Runfola",
-	          role = "aut",
-                  email = "team@geoboundaries.org"),
-             person(given = "Ahmadou", family = "Dicko",
-	          role = "ctb",
+Title: A Client to geoBoundaries, A Political Administrative Boundaries Dataset
+Version: 1.2.9000
+Authors@R: c(person(given = "Ahmadou", family = "Dicko",
+	          role = c("aut", "cre"),
                   email = "mail@ahmadoudicko.com"),
              person(given = "Andy", family = "South",
-		  email = "southandy@gmail.com",
-		  role = "ctb"),
-	     person(given = "Rohith Reddy", family = "Mandala",
-		  email = "rohithreddy.m4@gmail.com",
-		  role = "cre"))
+         	  role = "ctb",
+		  email = "southandy@gmail.com"),
+             person(given = "Daniel", family = "Runfola",
+	          role = "ctb",
+                  email = "team@geoboundaries.org"),
+             person(given = "Rohith Reddy", family = "Mandala",
+           	  role = "ctb",
+		  email = "rohithreddy.m4@gmail.com"))
 Description: Client the access data from the geoBoundaries API who provides country
   political administrative boundaries dataset.
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
 URL: https://github.com/wmgeolab/rgeoboundaries
 BugReports: https://github.com/wmgeolab/rgeoboundaries/issues
 Depends:
-    R (>= 3.5)
+    R (>= 4.1)
 Imports:
-    crul (>= 0.8),
+    crul (>= 1.4.0),
     jsonlite,
-    sf (>= 0.9.3),
+    sf (>= 1.0.0),
     hoardr,
     glue,
     memoise,
     countrycode (>= 1.2.0),
-    dplyr
+    lifecycle
 Suggests:
     roxygen2,
     knitr,
@@ -38,4 +37,6 @@ Suggests:
     testthat,
     covr,
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1.9000
+RoxygenNote: 7.2.3
+X-schema.org-applicationCategory: Data Access
+X-schema.org-keywords: geoboundaries, boundaries, gis, map, geographic, data, spatial, dataset
