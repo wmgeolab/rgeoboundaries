@@ -1,7 +1,6 @@
 #' @importFrom sf st_read
 #' @noRd
-
-.read_gb <- function(path, quiet = TRUE, canNames = NULL, country) {
+.read_gb <- function(path, quiet = TRUE) {
   if (length(path) >= 2) {
       l <- lapply(seq_along(path), function(i)
         st_read(path[i], quiet = quiet))
@@ -9,12 +8,6 @@
   } else {
       res <- st_read(path, quiet = quiet)
   }
-  if (!is.null(canNames)) {
-    iso3 <- country_to_iso3(country)
-    condition <- tolower(res$shapeGroup) %in% tolower(iso3)
-    res$boundaryCanonical[condition] <- canNames[match(tolower(res$shapeGroup[condition]), tolower(iso3))]
-  }
-  
   res
 }
 
@@ -26,26 +19,35 @@ read_gb <- memoise(.read_gb)
 #'
 #' Access country boundaries at a specified administrative level
 #'
-#'
 #' @importFrom tools file_path_as_absolute
+#' @importFrom lifecycle deprecated deprecate_warn is_present
 #'
 #' @rdname geoboundaries
 #' @param country characher; a vector of country names or country ISO3. If NULL all countries will be used
 #'  for adm0, adm1, adm2 where the administrative level are available
 #' @param adm_lvl character; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. adm0 being the country boundary. 0, 1, 2, 3, 4 or 5 can also be used.
-#' @param type character; defaults to Simplified. One of Simplified or Unsimplified.
-#'  Determines the type of boundary link you receive. More on details
-#' @param quiet logical; if TRUE no message while downloading and reading the data. Default to FALSE
+#' @param type character; One of simplified and unsimplified.
+#'  Determines the type of boundary to use. Default to unsimplified.
+#' @param release_type character; This is one of gbOpen, gbHumanitarian, or gbAuthoritative.
+#' For most users, we suggest using gbOpen, as it is CC-BY 4.0 compliant, and can be used for most
+#' purposes so long as attribution is provided. gbHumanitarian files are mirrored from UN OCHA,
+#' but may have less open licensure. gbAuthoritative files are mirrored from UN SALB, and cannot
+#' be used for commerical purposes, but are verified through in-country processes.
+#' Default to gbOpen
+#' @param quiet logical; if TRUE no message while downloading and reading the data.
+#' Default to FALSE
+#' @param overwrite logical; if TRUE overwrite the files downloaded previously in the cache.
+#' Default to FALSE.
+#' @param version character; deprecated parameter.
 #'
 #' @details
-#' Different types to of boundaries available:
+#' Different types of boundaries are available:
 #'
-#' * Unsimplified - High Precision Single Country Unstadardized. The premier geoBoundaries release,
-#'   representing the highest precision files available for every country in the world.
-#'   No standardization is performed on these files, so (for example) two countries
-#'   may overlap in the case of contested boundaries.
+#' * unsimplified - The premier geoBoundaries release, representing the highest precision files
+#'   available for every country in the world. No standardization is performed on these
+#'   files, so (for example) two countries may overlap in the case of contested boundaries.
 #'
-#' * Simplified - Simplified Single Country Unstandardized. A simplified version of every file
+#' * simplified - A simplified version of every file
 #'   available for every country in the world. No standardization is performed on these files,
 #'   so (for example) two countries may overlap in the case of contested boundaries.
 #'
@@ -66,87 +68,179 @@ read_gb <- memoise(.read_gb)
 #' @return a `sf` object
 #'
 #' @export
-geoboundaries <- function(country = NULL, adm_lvl = "adm0",
-                          type = NULL, version = NULL, quiet = TRUE) {
-  if (is.null(country) || (!is.null(type) && tolower(type) == "cgaz")) {
-    
-    path <- get_cgaz_shp_link(adm_lvl, quiet = quiet)
-    res <- read_gb(path, quiet = quiet)
+geoboundaries <- function(country = NULL,
+                          adm_lvl = "adm0",
+                          type = c("unsimplified", "simplified",
+                                   "UNSIMPLIFIED", "SIMPLIFIED",
+                                   "HPSCU", "HPSCGS", "SSCGS", "SSCU", "CGAZ",
+                                   "hpscu", "hpscgs", "sscgs", "sscu", "cgaz"),
+                          release_type = c("gbOpen", "gbHumanitarian", "gbAuthoritative"),
+                          quiet = TRUE,
+                          overwrite = FALSE,
+                          version = deprecated()) {
+
+  if (lifecycle::is_present(version)) {
+    lifecycle::deprecate_warn("0.5",
+                              "rgeoboundaries::geoboundaries(version = )")
+  }
+
+  type <- match.arg(type)
+  type <- tolower(type)
+
+  type <- switch(type,
+                 hpscu = "unsimplified",
+                 hpscgs = "unsimplified",
+                 sscu = "simplified",
+                 sscgs = "simplified",
+                 cgaz = "cgaz",
+                 simplified = "simplified",
+                 unsimplified = "unsimplified")
+
+  if (type == "cgaz" & !is.null(country)) {
+    warning("'cgaz' type not needed, just use `geoboundaries` or `gb_adm` without `country`",
+            call. = FALSE)
+    country <- NULL
+  }
+
+  release_type <- match.arg(release_type)
+
+  if (is.null(country)) {
+    path <- get_cgaz_shp_link(adm_lvl,
+                              quiet = quiet,
+                              force = overwrite)
+    path <- file.path("/vsizip", path)
+    res <- read_gb(path,
+                   quiet = quiet)
   } else {
-    links <- get_zip_links(country = country,
+    df <- get_adm_shp_link(country = country,
                            adm_lvl = adm_lvl,
                            type = type,
-                           version = version)
-    canNames<- links[["canonicalnames"]]
-    links <- as.character(links[["Links"]])
-    shps <- get_shp_from_links(links, tolower(type))
-    shps <- vapply(shps, file_path_as_absolute, character(1))
-    #path <- file.path("/vsizip", shps)
-    #andys temporary patch to fix encoding differences in geoboundaries
-    encoding  <-  "WINDOWS-1252"
-    if (!is.null(type) && tolower(type) != "hpscu" && tolower(type) != "unsimplified")
-      encoding <- "UTF-8"
-    res <- read_gb(shps, quiet = quiet, canNames, country)
-
-    if(!is.null(type) && ((type)=="hpscu" || (type)=="sscgs" || (type)=="sscu")){
-      print("WARNING: geoBoundaries provides only two types of boundaries: simplified and unsimplified. For backwards compatability purposes, if you selected SSCGS or SSCU it will be changed to simplified, and HPSCU will be changed to unsimplifed.")
-    }   
+                           release_type = release_type,
+                           force = overwrite)
+    path <- file.path("/vsizip", df$path)
+    res <- read_gb(path, quiet = quiet)
+    res <- merge(res,
+                 df[,c("shapeGroup", "shapeType", "shapeCanonical")],
+                 by = c("shapeGroup", "shapeType"))
   }
   res
 }
 
-
 #' @rdname geoboundaries
 #' @export
-gb_adm0 <- function(country = NULL, type = NULL, version = NULL,  quiet = TRUE) {
+gb_adm0 <- function(country = NULL, type = NULL, release_type = NULL,
+                    quiet = TRUE,
+                    overwrite = FALSE,
+                    version = deprecated()) {
+
+  if (lifecycle::is_present(version)) {
+    lifecycle::deprecate_warn("0.5",
+                              "rgeoboundaries::gb_adm0(version = )")
+  }
+
   geoboundaries(country = country,
                 adm_lvl = "adm0",
                 type = type,
-                version = version,
+                release_type = release_type,
+                quiet = quiet,
+                overwrite = overwrite)
+}
+
+#' @rdname geoboundaries
+#' @export
+gb_adm1 <- function(country = NULL, type = NULL, release_type = NULL,
+                    quiet = TRUE,
+                    overwrite = FALSE,
+                    version = deprecated()) {
+
+  if (lifecycle::is_present(version)) {
+    lifecycle::deprecate_warn("0.5",
+                              "rgeoboundaries::gb_adm1(version = )")
+  }
+
+  geoboundaries(country = country,
+                adm_lvl = "adm1",
+                type = type,
+                release_type = release_type,
+                quiet = quiet,
+                overwrite = overwrite)
+}
+
+#' @rdname geoboundaries
+#' @export
+gb_adm2 <- function(country = NULL, type = NULL,
+                    release_type = NULL,
+                    quiet = TRUE,
+                    version = deprecated()) {
+
+  if (lifecycle::is_present(version)) {
+    lifecycle::deprecate_warn("0.5",
+                              "rgeoboundaries::gb_adm2(version = )")
+  }
+
+  geoboundaries(country = country,
+                adm_lvl = "adm2",
+                type = type,
+                release_type = release_type,
                 quiet = quiet)
 }
 
 #' @rdname geoboundaries
 #' @export
-gb_adm1 <- function(country = NULL, type = NULL, version = NULL, quiet = TRUE)
-  geoboundaries(country = country,
-                adm_lvl = "adm1",
-                type = type,
-                version = version,
-                quiet = quiet)
+gb_adm3 <- function(country = NULL, type = NULL, release_type = NULL,
+                    quiet = TRUE,
+                    overwrite = FALSE,
+                    version = deprecated()) {
 
-#' @rdname geoboundaries
-#' @export
-gb_adm2 <- function(country = NULL, type = NULL, version = NULL, quiet = TRUE)
-  geoboundaries(country = country,
-                adm_lvl = "adm2",
-                type = type,
-                version = version,
-                quiet = quiet)
+  if (lifecycle::is_present(version)) {
+    lifecycle::deprecate_warn("0.5",
+                              "rgeoboundaries::gb_adm3(version = )")
+  }
 
-#' @rdname geoboundaries
-#' @export
-gb_adm3 <- function(country, type = NULL, version = NULL, quiet = TRUE)
   geoboundaries(country = country,
                 adm_lvl = "adm3",
                 type = type,
-                version = version,
-                quiet = quiet)
+                release_type = release_type,
+                quiet = quiet,
+                overwrite = overwrite)
+}
 
 #' @rdname geoboundaries
 #' @export
-gb_adm4 <- function(country, type = NULL, version = NULL, quiet = TRUE)
+gb_adm4 <- function(country = NULL, type = NULL, release_type = NULL,
+                    quiet = TRUE,
+                    overwrite = FALSE,
+                    version = deprecated()) {
+
+  if (lifecycle::is_present(version)) {
+    lifecycle::deprecate_warn("0.5",
+                              "rgeoboundaries::gb_adm4(version = )")
+  }
+
   geoboundaries(country = country,
                 adm_lvl = "adm4",
                 type = type,
-                version = version,
-                quiet = quiet)
+                release_type = release_type,
+                quiet = quiet,
+                overwrite = overwrite)
+}
 
 #' @rdname geoboundaries
 #' @export
-gb_adm5 <- function(country, type = NULL, version = NULL, quiet = TRUE)
+gb_adm5 <- function(country = NULL, type = NULL, release_type = NULL,
+                    quiet = TRUE,
+                    overwrite = FALSE,
+                    version = deprecated()) {
+
+  if (lifecycle::is_present(version)) {
+    lifecycle::deprecate_warn("0.5",
+                              "rgeoboundaries::gb_adm5(version = )")
+  }
+
   geoboundaries(country = country,
                 adm_lvl = "adm5",
                 type = type,
-                version = version,
-                quiet = quiet)
+                release_type = release_type,
+                quiet = quiet,
+                overwrite = overwrite)
+}

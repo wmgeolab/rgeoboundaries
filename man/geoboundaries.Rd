@@ -13,37 +13,90 @@
 geoboundaries(
   country = NULL,
   adm_lvl = "adm0",
-  type = NULL,
-  version = NULL,
-  quiet = TRUE
+  type = c("unsimplified", "simplified", "UNSIMPLIFIED", "SIMPLIFIED", "HPSCU", "HPSCGS",
+    "SSCGS", "SSCU", "CGAZ", "hpscu", "hpscgs", "sscgs", "sscu", "cgaz"),
+  release_type = c("gbOpen", "gbHumanitarian", "gbAuthoritative"),
+  quiet = TRUE,
+  overwrite = FALSE,
+  version = deprecated()
 )
 
-gb_adm0(country = NULL, type = NULL, version = NULL, quiet = TRUE)
+gb_adm0(
+  country = NULL,
+  type = NULL,
+  release_type = NULL,
+  quiet = TRUE,
+  overwrite = FALSE,
+  version = deprecated()
+)
 
-gb_adm1(country = NULL, type = NULL, version = NULL, quiet = TRUE)
+gb_adm1(
+  country = NULL,
+  type = NULL,
+  release_type = NULL,
+  quiet = TRUE,
+  overwrite = FALSE,
+  version = deprecated()
+)
 
-gb_adm2(country = NULL, type = NULL, version = NULL, quiet = TRUE)
+gb_adm2(
+  country = NULL,
+  type = NULL,
+  release_type = NULL,
+  quiet = TRUE,
+  version = deprecated()
+)
 
-gb_adm3(country, type = NULL, version = NULL, quiet = TRUE)
+gb_adm3(
+  country = NULL,
+  type = NULL,
+  release_type = NULL,
+  quiet = TRUE,
+  overwrite = FALSE,
+  version = deprecated()
+)
 
-gb_adm4(country, type = NULL, version = NULL, quiet = TRUE)
+gb_adm4(
+  country = NULL,
+  type = NULL,
+  release_type = NULL,
+  quiet = TRUE,
+  overwrite = FALSE,
+  version = deprecated()
+)
 
-gb_adm5(country, type = NULL, version = NULL, quiet = TRUE)
+gb_adm5(
+  country = NULL,
+  type = NULL,
+  release_type = NULL,
+  quiet = TRUE,
+  overwrite = FALSE,
+  version = deprecated()
+)
 }
 \arguments{
 \item{country}{characher; a vector of country names or country ISO3. If NULL all countries will be used
 for adm0, adm1, adm2 where the administrative level are available}
 
-\item{adm_lvl}{characher; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. adm0 being the country boundary. 0, 1, 2, 3, 4 or 5 can also be used.}
+\item{adm_lvl}{character; administrative level, adm0, adm1, adm2, adm3, adm4 or adm5. adm0 being the country boundary. 0, 1, 2, 3, 4 or 5 can also be used.}
 
-\item{type}{character; defaults to simplified. One of 'unsimplified' or 'simplified'.
-Determines the type of boundary link you receive. More on details}
+\item{type}{character; One of simplified and unsimplified.
+Determines the type of boundary to use. Default to unsimplified.}
 
-\item{quiet}{logical; if TRUE no message while downloading and reading the data. Default to FALSE}
+\item{release_type}{character; This is one of gbOpen, gbHumanitarian, or gbAuthoritative.
+For most users, we suggest using gbOpen, as it is CC-BY 4.0 compliant, and can be used for most
+purposes so long as attribution is provided. gbHumanitarian files are mirrored from UN OCHA,
+but may have less open licensure. gbAuthoritative files are mirrored from UN SALB, and cannot
+be used for commerical purposes, but are verified through in-country processes.
+Default to gbOpen}
 
-\item{version}{character; defaults to the most recent version of geoBoundaries available.
-The geoboundaries version requested, with underscores. For example, 3_0_0 would return data
-from version 3.0.0 of geoBoundaries.}
+\item{quiet}{logical; if TRUE no message while downloading and reading the data.
+Default to FALSE}
+
+\item{overwrite}{logical; if TRUE overwrite the files downloaded previously in the cache.
+Default to FALSE.}
+
+\item{version}{character; deprecated parameter.}
 }
 \value{
 a \code{sf} object
@@ -52,13 +105,12 @@ a \code{sf} object
 Access country boundaries at a specified administrative level
 }
 \details{
-Different types to of boundaries available:
+Different types of boundaries are available:
 \itemize{
-\item Unsimplified - High Precision Single Country Unstadardized. The premier geoBoundaries release,
-representing the highest precision files available for every country in the world.
-No standardization is performed on these files, so (for example) two countries
-may overlap in the case of contested boundaries.
-\item Simplified - Simplified Single Country Unstandardized. A simplified version of every file
+\item unsimplified - The premier geoBoundaries release, representing the highest precision files
+available for every country in the world. No standardization is performed on these
+files, so (for example) two countries may overlap in the case of contested boundaries.
+\item simplified - A simplified version of every file
 available for every country in the world. No standardization is performed on these files,
 so (for example) two countries may overlap in the case of contested boundaries.
 }
@@ -68,7 +120,7 @@ The following wrappers are also available:
 \item \code{gb_adm0} returns the country boundaries
 \item \code{gb_adm1} if available, returns the country first administrative level boundaries
 \item \code{gb_adm2} if available, returns the country second administrative level boundaries
-\item \code{gb_adm3} if available, returns the country third administrative level boundaries
+\item \code{gb_adm3} if avaiable, returns the country third administrative level boundaries
 \item \code{gb_adm4} if available, returns the country fourth administrative level boundaries
 \item \code{gb_adm5} if available, returns the country first administrative level boundaries
 }
