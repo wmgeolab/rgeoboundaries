@@ -224,13 +224,22 @@ get_adm_shp_link <- function(country = NULL,
                adm_lvl = adm_lvl,
                release_type = release_type)
   urls <- l[["staticDownloadLink"]]
-  cache_dir <- gb_get_cache()
-  destfiles <- file.path(cache_dir, basename(urls))
+  temp_dir <- tempdir()
+  
+  if (!dir.exists(temp_dir)) {
+    message("Creating temporary directory ", temp_dir)
+    dir.create(temp_dir)
+  }
+  
+  destfiles <- file.path(temp_dir, basename(urls))
   if (!all(file.exists(destfiles)) | isTRUE(force)) {
+    sys_timeout <- getOption('timeout')
+    options(timeout = 600)  # Set custom timeout duration
     lapply(seq_along(urls), \(i)
            download.file(urls[i],
                          destfile = destfiles[i],
                          quiet = quiet))
+    options(timeout = sys_timeout)
   }
   files <- switch(type,
                   unsimplified = gsub("-all.zip$", ".shp",
@@ -260,13 +269,21 @@ get_cgaz_shp_link <- function(adm_lvl = "adm0", quiet = TRUE, force = FALSE) {
                               "geoBoundariesCGAZ_ADM1.zip"),
                 adm2 = paste0(base_url,
                               "geoBoundariesCGAZ_ADM2.zip"))
-  cache_dir <- gb_get_cache()
+  temp_dir <- tempdir()
+  
+  if (!dir.exists(temp_dir)) {
+    message("Creating temporary directory ", temp_dir)
+    dir.create(temp_dir)
+  }
   urls <- url_root
-  destfiles <- file.path(cache_dir, basename(urls))
+  destfiles <- file.path(temp_dir, basename(urls))
   if (!all(file.exists(destfiles)) | isTRUE(force)) {
+    sys_timeout <- getOption('timeout')
+    options(timeout = 600)  # Set custom timeout duration
     download.file(urls,
                   destfile = destfiles,
                   quiet = quiet)
+    options(timeout = sys_timeout)
   }
   path.expand(destfiles)
 }

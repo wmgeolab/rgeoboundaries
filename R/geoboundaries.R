@@ -7,6 +7,7 @@
       res <- do.call(rbind, l)
   } else {
       res <- st_read(path, quiet = quiet)
+      res <- sf::st_cast(res, "MULTIPOLYGON")
   }
   res
 }
