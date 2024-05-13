@@ -1,0 +1,4 @@
+To create the R package and verify its compliance with CRAN guidelines, you'll follow these steps:
+
+1) Navigate to the directory containing the package files and run the command `R CMD build .` to build the package tar file.
+2) After the first command generates the tar file, you can check the package by running `R CMD check --as-cran rgeoboundaries_1.1.0.tar.gz`. Make sure to replace `rgeoboundaries_1.1.0.tar.gz` with the actual name of the generated tar file from the previous step.
