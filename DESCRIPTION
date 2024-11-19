@@ -1,6 +1,6 @@
 Package: rgeoboundaries
 Title: A Client to geoBoundaries, A Political Administrative Boundaries Dataset
-Version: 1.2.9000
+Version: 1.2.9100
 Authors@R: c(person(given = "Ahmadou", family = "Dicko",
 	          role = c("aut", "cre"),
                   email = "mail@ahmadoudicko.com"),
@@ -25,7 +25,6 @@ Imports:
     crul (>= 1.4.0),
     jsonlite,
     sf (>= 1.0.0),
-    hoardr,
     glue,
     memoise,
     countrycode (>= 1.2.0),
