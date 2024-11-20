@@ -1,14 +1,14 @@
 Package: rgeoboundaries
-Title: A Client to geoBoundaries, A Political Administrative Boundaries Dataset
-Version: 1.2.9100
+Title: A Client to geoBoundaries, a Political Administrative Boundaries Dataset
+Version: 1.3.1
 Authors@R: c(person(given = "Ahmadou", family = "Dicko",
-	          role = c("aut", "cre"),
+	          role = c("aut"),
                   email = "mail@ahmadoudicko.com"),
              person(given = "Andy", family = "South",
          	  role = "ctb",
 		  email = "southandy@gmail.com"),
              person(given = "Daniel", family = "Runfola",
-	          role = "ctb",
+	          role = c("ctb", "cre"),
                   email = "team@geoboundaries.org"),
              person(given = "Rohith Reddy", family = "Mandala",
            	  role = "ctb",
